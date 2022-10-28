@@ -13,7 +13,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
     using AddressArray for AddressArray.Data;
 
     error AlreadyJoined();
-    error PodIsNotConnected();
+    error PodIsNotAttached();
     error InvalidPodAddress();
     error PodsLimitReachedForAccount();
 
@@ -42,23 +42,23 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
         return _pods[account].items.get();
     }
 
-    function connect(address pod) external override {
+    function attach(address pod) external override {
         if (pod == address(0)) revert InvalidPodAddress();
         if (!_pods[msg.sender].add(pod)) revert AlreadyJoined();
         if (_pods[msg.sender].length() > podsLimit) revert PodsLimitReachedForAccount();
         _updateBalances(pod, address(0), msg.sender, balanceOf(msg.sender));
     }
 
-    function disconnect(address pod) public override {
-        if (!_pods[msg.sender].remove(pod)) revert PodIsNotConnected();
+    function detach(address pod) public override {
+        if (!_pods[msg.sender].remove(pod)) revert PodIsNotAttached();
         _updateBalances(pod, msg.sender, address(0), balanceOf(msg.sender));
     }
 
-    function disconnectAll() external virtual {
+    function detachAll() external virtual {
         address[] memory items = _pods[msg.sender].items.get();
         unchecked {
             for (uint256 i = items.length; i > 0; i--) {
-                disconnect(items[i - 1]);
+                detach(items[i - 1]);
             }
         }
     }

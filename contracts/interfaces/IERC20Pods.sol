@@ -10,6 +10,6 @@ interface IERC20Pods is IERC20 {
     function podAt(address account, uint256 index) external view returns(address);
     function pods(address account) external view returns(address[] memory);
 
-    function connect(address pod) external;
-    function disconnect(address pod) external;
+    function attach(address pod) external;
+    function detach(address pod) external;
 }
