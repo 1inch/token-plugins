@@ -42,23 +42,23 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
         return _pods[account].items.get();
     }
 
-    function attach(address pod) external override {
+    function addPod(address pod) external override {
         if (pod == address(0)) revert InvalidPodAddress();
         if (!_pods[msg.sender].add(pod)) revert AlreadyJoined();
         if (_pods[msg.sender].length() > podsLimit) revert PodsLimitReachedForAccount();
         _updateBalances(pod, address(0), msg.sender, balanceOf(msg.sender));
     }
 
-    function detach(address pod) public override {
+    function removePod(address pod) public override {
         if (!_pods[msg.sender].remove(pod)) revert PodIsNotAttached();
         _updateBalances(pod, msg.sender, address(0), balanceOf(msg.sender));
     }
 
-    function detachAll() external virtual {
+    function removeAllPods() external virtual {
         address[] memory items = _pods[msg.sender].items.get();
         unchecked {
             for (uint256 i = items.length; i > 0; i--) {
-                detach(items[i - 1]);
+                removePod(items[i - 1]);
             }
         }
     }
