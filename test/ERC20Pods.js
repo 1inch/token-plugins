@@ -5,10 +5,10 @@ const { ethers } = require('hardhat');
 const POD_LIMITS = 10;
 
 describe('ERC20Pods', function () {
-    let wallet1, wallet2, wallet3;
+    let wallet1, wallet2;
 
     before(async function () {
-        [wallet1, wallet2, wallet3] = await ethers.getSigners();
+        [wallet1, wallet2] = await ethers.getSigners();
     });
 
     async function initContracts () {
