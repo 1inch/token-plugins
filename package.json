@@ -27,7 +27,7 @@
     "eslint-plugin-promise": "6.1.1",
     "ethers": "5.7.2",
     "hardhat": "2.12.1",
-    "hardhat-dependency-compiler": "^1.1.3",
+    "hardhat-dependency-compiler": "1.1.3",
     "hardhat-deploy": "0.11.19",
     "hardhat-gas-reporter": "1.0.9",
     "rimraf": "3.0.2",
@@ -35,7 +35,7 @@
     "solidity-coverage": "0.8.2"
   },
   "scripts": {
-    "clean": "rimraf artifacts cache coverage coverage.json",
+    "clean": "rimraf artifacts cache coverage coverage.json contracts/hardhat-dependency-compiler",
     "coverage": "hardhat coverage",
     "deploy": "hardhat deploy --network",
     "lint": "yarn run lint:js && yarn run lint:sol",

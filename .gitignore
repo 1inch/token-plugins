@@ -1,6 +1,7 @@
 artifacts
 cache
 node_modules
+hardhat-dependency-compiler
 coverage
 coverage.json
 build
