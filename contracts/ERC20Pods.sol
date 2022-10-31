@@ -76,8 +76,22 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
         }
     }
 
+    /// @notice Assembly implementation of the gas limited call to avoid return gas bomb
+    /// @dev try IPod(pod).updateBalances{gas: _POD_CALL_GAS_LIMIT}(from, to, amount) {} catch {}
     function _updateBalances(address pod, address from, address to, uint256 amount) private {
-        try IPod(pod).updateBalances{gas: _POD_CALL_GAS_LIMIT}(from, to, amount) {} catch {} // solhint-disable-line no-empty-blocks
+        bytes4 selector = IPod.updateBalances.selector;
+        assembly {  // solhint-disable-line no-inline-assembly
+            let ptr := mload(0x40)
+            mstore(ptr, selector)
+            mstore(add(ptr, 0x04), from)
+            mstore(add(ptr, 0x24), to)
+            mstore(add(ptr, 0x44), amount)
+
+            if iszero(call(_POD_CALL_GAS_LIMIT, pod, 0, ptr, 0x64, 0, 0)) {
+                returndatacopy(ptr, 0, returndatasize())
+                revert(ptr, returndatasize())
+            }
+        }
     }
 
     // ERC20 Overrides
