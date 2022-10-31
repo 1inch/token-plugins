@@ -17,7 +17,7 @@ contract PodMock is ERC20, Pod {
     function updateBalances(address from, address to, uint256 amount) external {
         if (isRevert) revert PodsUpdateBalanceRevert();
         if (isOutOfGas) assert(false);
-        if (isReturnGasBomb) { assembly { return(0, 1000000000) } } // solhint-disable-line no-inline-assembly
+        if (isReturnGasBomb) { assembly { return(0, 1000000) } } // solhint-disable-line no-inline-assembly
         if (from == address(0)) {
             _mint(to, amount);
         } else if (to == address(0)) {

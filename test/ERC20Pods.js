@@ -224,9 +224,11 @@ describe('ERC20Pods', function () {
             expect(await this.erc20Pods.pods(wallet1.address)).to.have.deep.equals([this.pods[0].address]);
         });
 
-        it('should not fail when updateBalance returns gas bomb', async function () {
+        it('should not fail when updateBalance returns gas bomb @skip-on-coverage', async function () {
             await this.pods[0].setReturnGasBomb(true);
-            await this.erc20Pods.addPod(this.pods[0].address);
+            const tx = await this.erc20Pods.addPod(this.pods[0].address);
+            const receipt = await tx.wait();
+            expect(receipt.gasUsed).to.be.lt(272123); // 272123 with solidity instead of assembly
             expect(await this.erc20Pods.pods(wallet1.address)).to.have.deep.equals([this.pods[0].address]);
         });
     });
