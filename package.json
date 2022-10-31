@@ -1,5 +1,5 @@
 {
-  "name": "erc20-pods",
+  "name": "@1inch/erc20-pods",
   "version": "0.0.1",
   "description": "ERC20 extension enabling external smart contract based Pods to track balances of those users who opted-in to these Pods",
   "repository": {
