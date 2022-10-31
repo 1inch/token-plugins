@@ -95,7 +95,8 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
         }
     }
 
-    /// @notice Assembly implementation of the gas limited call to avoid return gas bomb
+    /// @notice Assembly implementation of the gas limited call to avoid return gas bomb,
+    // moreover call to a destructed pod would also revert even inside try-catch block in Solidity 0.8.17
     /// @dev try IPod(pod).updateBalances{gas: _POD_CALL_GAS_LIMIT}(from, to, amount) {} catch {}
     function _updateBalances(address pod, address from, address to, uint256 amount) private {
         bytes4 selector = IPod.updateBalances.selector;
