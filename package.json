@@ -1,11 +1,16 @@
 {
-  "name": "erc20-pods",
-  "version": "0.0.1",
+  "name": "@1inch/erc20-pods",
+  "version": "0.0.2",
   "description": "ERC20 extension enabling external smart contract based Pods to track balances of those users who opted-in to these Pods",
   "repository": {
     "type": "git",
     "url": "git@github.com:1inch/erc20-pods.git"
   },
+  "bugs": {
+    "url": "https://github.com/1inch/erc20-pods/issues"
+  },
+  "homepage": "https://github.com/1inch/erc20-pods#readme",
+  "author": "1inch",
   "license": "MIT",
   "dependencies": {
     "@1inch/solidity-utils": "^2.2.0",
@@ -46,5 +51,8 @@
     "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
     "test": "hardhat test --parallel",
     "test:ci": "hardhat test"
-  }
+  },
+  "files": [
+    "contracts"
+  ]
 }

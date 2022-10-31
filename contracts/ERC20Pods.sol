@@ -43,41 +43,71 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
         return _pods[account].items.get();
     }
 
-    function addPod(address pod) public virtual {
-        if (pod == address(0)) revert InvalidPodAddress();
-        if (!_pods[msg.sender].add(pod)) revert PodAlreadyAdded();
-        if (_pods[msg.sender].length() > podsLimit) revert PodsLimitReachedForAccount();
-
-        uint256 balance = balanceOf(msg.sender);
-        if (balance > 0) {
-            _updateBalances(pod, address(0), msg.sender, balance);
+    function podBalanceOf(address pod, address account) public view returns(uint256) {
+        if (hasPod(account, pod)) {
+            return balanceOf(account);
         }
+        return 0;
+    }
+
+    function addPod(address pod) public virtual {
+        _addPod(msg.sender, pod);
     }
 
     function removePod(address pod) public virtual {
-        if (!_pods[msg.sender].remove(pod)) revert PodNotFound();
-
-        uint256 balance = balanceOf(msg.sender);
-        if (balance > 0) {
-            _updateBalances(pod, msg.sender, address(0), balance);
-        }
+        _removePod(msg.sender, pod);
     }
 
     function removeAllPods() public virtual {
-        address[] memory items = _pods[msg.sender].items.get();
-        uint256 balance = balanceOf(msg.sender);
+        _removeAllPods(msg.sender);
+    }
+
+    function _addPod(address account, address pod) internal virtual {
+        if (pod == address(0)) revert InvalidPodAddress();
+        if (!_pods[account].add(pod)) revert PodAlreadyAdded();
+        if (_pods[account].length() > podsLimit) revert PodsLimitReachedForAccount();
+
+        uint256 balance = balanceOf(account);
+        if (balance > 0) {
+            _updateBalances(pod, address(0), account, balance);
+        }
+    }
+
+    function _removePod(address account, address pod) internal virtual {
+        if (!_pods[account].remove(pod)) revert PodNotFound();
+
+        uint256 balance = balanceOf(account);
+        if (balance > 0) {
+            _updateBalances(pod, account, address(0), balance);
+        }
+    }
+
+    function _removeAllPods(address account) internal virtual {
+        address[] memory items = _pods[account].items.get();
+        uint256 balance = balanceOf(account);
         unchecked {
             for (uint256 i = items.length; i > 0; i--) {
                 if (balance > 0) {
-                    _updateBalances(items[i - 1], msg.sender, address(0), balance);
+                    _updateBalances(items[i - 1], account, address(0), balance);
                 }
-                _pods[msg.sender].remove(items[i - 1]);
+                _pods[account].remove(items[i - 1]);
             }
         }
     }
 
+    /// @notice Assembly implementation of the gas limited call to avoid return gas bomb
+    /// @dev try IPod(pod).updateBalances{gas: _POD_CALL_GAS_LIMIT}(from, to, amount) {} catch {}
     function _updateBalances(address pod, address from, address to, uint256 amount) private {
-        try IPod(pod).updateBalances{gas: _POD_CALL_GAS_LIMIT}(from, to, amount) {} catch {} // solhint-disable-line no-empty-blocks
+        bytes4 selector = IPod.updateBalances.selector;
+        assembly {  // solhint-disable-line no-inline-assembly
+            let ptr := mload(0x40)
+            mstore(ptr, selector)
+            mstore(add(ptr, 0x04), from)
+            mstore(add(ptr, 0x24), to)
+            mstore(add(ptr, 0x44), amount)
+
+            pop(call(_POD_CALL_GAS_LIMIT, pod, 0, ptr, 0x64, 0, 0))
+        }
     }
 
     // ERC20 Overrides
