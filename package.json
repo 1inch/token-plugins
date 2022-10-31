@@ -6,6 +6,11 @@
     "type": "git",
     "url": "git@github.com:1inch/erc20-pods.git"
   },
+  "bugs": {
+    "url": "https://github.com/1inch/erc20-pods/issues"
+  },
+  "homepage": "https://github.com/1inch/erc20-pods#readme",
+  "author": "1inch",
   "license": "MIT",
   "dependencies": {
     "@1inch/solidity-utils": "^2.2.0",
