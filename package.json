@@ -46,5 +46,8 @@
     "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
     "test": "hardhat test --parallel",
     "test:ci": "hardhat test"
-  }
+  },
+  "files": [
+    "contracts"
+  ]
 }
