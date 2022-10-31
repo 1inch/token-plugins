@@ -206,6 +206,10 @@ describe('ERC20Pods', function () {
     });
 
     describe('_updateBalances', function () {
+        beforeEach(async function () {
+            await this.erc20Pods.mint(wallet1.address, ether('1'));
+        });
+
         it('should not fail when updateBalance in pod reverts', async function () {
             await this.pods[0].setIsRevert(true);
             await expect(this.pods[0].updateBalances(wallet1.address, wallet2.address, ether('1')))
@@ -216,6 +220,12 @@ describe('ERC20Pods', function () {
 
         it('should not fail when updateBalance in pod has OutOfGas', async function () {
             await this.pods[0].setOutOfGas(true);
+            await this.erc20Pods.addPod(this.pods[0].address);
+            expect(await this.erc20Pods.pods(wallet1.address)).to.have.deep.equals([this.pods[0].address]);
+        });
+
+        it('should not fail when updateBalance returns gas bomb', async function () {
+            await this.pods[0].setReturnGasBomb(true);
             await this.erc20Pods.addPod(this.pods[0].address);
             expect(await this.erc20Pods.pods(wallet1.address)).to.have.deep.equals([this.pods[0].address]);
         });
