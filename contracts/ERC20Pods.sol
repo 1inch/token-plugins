@@ -51,34 +51,46 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
     }
 
     function addPod(address pod) public virtual {
-        if (pod == address(0)) revert InvalidPodAddress();
-        if (!_pods[msg.sender].add(pod)) revert PodAlreadyAdded();
-        if (_pods[msg.sender].length() > podsLimit) revert PodsLimitReachedForAccount();
-
-        uint256 balance = balanceOf(msg.sender);
-        if (balance > 0) {
-            _updateBalances(pod, address(0), msg.sender, balance);
-        }
+        _addPod(msg.sender, pod);
     }
 
     function removePod(address pod) public virtual {
-        if (!_pods[msg.sender].remove(pod)) revert PodNotFound();
-
-        uint256 balance = balanceOf(msg.sender);
-        if (balance > 0) {
-            _updateBalances(pod, msg.sender, address(0), balance);
-        }
+        _removePod(msg.sender, pod);
     }
 
     function removeAllPods() public virtual {
-        address[] memory items = _pods[msg.sender].items.get();
-        uint256 balance = balanceOf(msg.sender);
+        _removeAllPods(msg.sender);
+    }
+
+    function _addPod(address account, address pod) internal virtual {
+        if (pod == address(0)) revert InvalidPodAddress();
+        if (!_pods[account].add(pod)) revert PodAlreadyAdded();
+        if (_pods[account].length() > podsLimit) revert PodsLimitReachedForAccount();
+
+        uint256 balance = balanceOf(account);
+        if (balance > 0) {
+            _updateBalances(pod, address(0), account, balance);
+        }
+    }
+
+    function _removePod(address account, address pod) internal virtual {
+        if (!_pods[account].remove(pod)) revert PodNotFound();
+
+        uint256 balance = balanceOf(account);
+        if (balance > 0) {
+            _updateBalances(pod, account, address(0), balance);
+        }
+    }
+
+    function _removeAllPods(address account) internal virtual {
+        address[] memory items = _pods[account].items.get();
+        uint256 balance = balanceOf(account);
         unchecked {
             for (uint256 i = items.length; i > 0; i--) {
                 if (balance > 0) {
-                    _updateBalances(items[i - 1], msg.sender, address(0), balance);
+                    _updateBalances(items[i - 1], account, address(0), balance);
                 }
-                _pods[msg.sender].remove(items[i - 1]);
+                _pods[account].remove(items[i - 1]);
             }
         }
     }
