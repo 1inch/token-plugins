@@ -32,6 +32,57 @@ describe('ERC20Pods', function () {
         Object.assign(this, await loadFixture(initContracts));
     });
 
+    describe('view methods', function () {
+        it('hasPod should return true when pod added by wallet', async function () {
+            await this.erc20Pods.addPod(this.pods[0].address);
+            expect(await this.erc20Pods.hasPod(wallet1.address, this.pods[0].address)).to.be.equals(true);
+            expect(await this.erc20Pods.hasPod(wallet2.address, this.pods[0].address)).to.be.equals(false);
+        });
+
+        it('podsCount should return pods amount which wallet using', async function () {
+            for (let i = 0; i < this.pods.length; i++) {
+                await this.erc20Pods.addPod(this.pods[i].address);
+                expect(await this.erc20Pods.podsCount(wallet1.address)).to.be.equals(i + 1);
+            }
+            for (let i = 0; i < this.pods.length; i++) {
+                await this.erc20Pods.removePod(this.pods[i].address);
+                expect(await this.erc20Pods.podsCount(wallet1.address)).to.be.equals(this.pods.length - (i + 1));
+            }
+        });
+
+        it('podAt should return pod by added pods index', async function () {
+            for (let i = 0; i < this.pods.length; i++) {
+                await this.erc20Pods.addPod(this.pods[i].address);
+                expect(await this.erc20Pods.podAt(wallet1.address, i)).to.be.equals(this.pods[i].address);
+                expect(await this.erc20Pods.podAt(wallet1.address, i + 1)).to.be.equals(constants.ZERO_ADDRESS);
+            }
+            for (let i = this.pods.length - 1; i >= 0; i--) {
+                await this.erc20Pods.removePod(this.pods[i].address);
+                for (let j = 0; j < this.pods.length; j++) {
+                    expect(await this.erc20Pods.podAt(wallet1.address, j))
+                        .to.be.equals(
+                            j >= i
+                                ? constants.ZERO_ADDRESS
+                                : this.pods[j].address,
+                        );
+                };
+            }
+        });
+
+        it('pods should return array of pods by wallet', async function () {
+            const pods = this.pods.map(pod => pod.address);
+            for (let i = 0; i < this.pods.length; i++) {
+                await this.erc20Pods.addPod(this.pods[i].address);
+                expect(await this.erc20Pods.pods(wallet1.address))
+                    .to.be.deep.equals(
+                        i < this.pods.length - 1
+                            ? pods.slice(0, -this.pods.length + 1 + i)
+                            : pods,
+                    );
+            }
+        });
+    });
+
     describe('addPod', function () {
         it('should not add pod with zero-address', async function () {
             await expect(this.erc20Pods.addPod(constants.ZERO_ADDRESS))
