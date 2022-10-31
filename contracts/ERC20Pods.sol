@@ -43,6 +43,13 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
         return _pods[account].items.get();
     }
 
+    function podBalanceOf(address pod, address account) public view returns(uint256) {
+        if (hasPod(account, pod)) {
+            return balanceOf(account);
+        }
+        return 0;
+    }
+
     function addPod(address pod) public virtual {
         if (pod == address(0)) revert InvalidPodAddress();
         if (!_pods[msg.sender].add(pod)) revert PodAlreadyAdded();
