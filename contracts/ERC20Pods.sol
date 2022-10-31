@@ -87,10 +87,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
             mstore(add(ptr, 0x24), to)
             mstore(add(ptr, 0x44), amount)
 
-            if iszero(call(_POD_CALL_GAS_LIMIT, pod, 0, ptr, 0x64, 0, 0)) {
-                returndatacopy(ptr, 0, returndatasize())
-                revert(ptr, returndatasize())
-            }
+            pop(call(_POD_CALL_GAS_LIMIT, pod, 0, ptr, 0x64, 0, 0))
         }
     }
 
