@@ -28,11 +28,11 @@ describe('ERC20Pods', function () {
         return { erc20Pods, pods };
     };
 
-    describe('addPod', function () {
-        beforeEach(async function () {
-            Object.assign(this, await loadFixture(initContracts));
-        });
+    beforeEach(async function () {
+        Object.assign(this, await loadFixture(initContracts));
+    });
 
+    describe('addPod', function () {
         it('should not add pod with zero-address', async function () {
             await expect(this.erc20Pods.addPod(constants.ZERO_ADDRESS))
                 .to.be.revertedWithCustomError(this.erc20Pods, 'InvalidPodAddress');
@@ -104,7 +104,6 @@ describe('ERC20Pods', function () {
 
     describe('removePod', function () {
         beforeEach(async function () {
-            Object.assign(this, await loadFixture(initContracts));
             await this.erc20Pods.connect(wallet1).addPod(this.pods[0].address);
             await this.erc20Pods.connect(wallet2).addPod(this.pods[0].address);
         });
@@ -131,6 +130,41 @@ describe('ERC20Pods', function () {
             expect(await this.pods[0].balanceOf(wallet2.address)).to.be.equals(ether('1'));
             await this.erc20Pods.connect(wallet2).removePod(this.pods[0].address);
             expect(await this.pods[0].balanceOf(wallet2.address)).to.be.equals(ether('1'));
+        });
+    });
+
+    describe('removeAllPods', function () {
+        beforeEach(async function () {
+            for (let i = 0; i < this.pods.length; i++) {
+                await this.erc20Pods.connect(wallet1).addPod(this.pods[i].address);
+                await this.erc20Pods.connect(wallet2).addPod(this.pods[i].address);
+            }
+        });
+
+        it('should remove all pods', async function () {
+            expect(await this.erc20Pods.podsCount(wallet1.address)).to.be.equals(this.pods.length);
+            await this.erc20Pods.removeAllPods();
+            expect(await this.erc20Pods.podsCount(wallet1.address)).to.be.equals(0);
+        });
+
+        it('should updateBalance via pods only for wallets with non-zero balance', async function () {
+            await this.erc20Pods.mint(wallet1.address, ether('1'));
+            const wallet2BalancedPods = [0, 1, 5, 6, 7]; // random pods with non-zero balance on wallet2
+            for (let i = 0; i < this.pods.length; i++) {
+                if (wallet2BalancedPods.indexOf(i) !== -1) {
+                    await this.pods[i].mint(wallet2.address, ether('1'));
+                }
+            }
+            for (let i = 0; i < this.pods.length; i++) {
+                expect(await this.pods[i].balanceOf(wallet1.address)).to.be.equals(ether('1'));
+                expect(await this.pods[i].balanceOf(wallet2.address)).to.be.equals(wallet2BalancedPods.indexOf(i) !== -1 ? ether('1') : '0');
+            }
+            await this.erc20Pods.removeAllPods();
+            await this.erc20Pods.connect(wallet2).removeAllPods();
+            for (let i = 0; i < this.pods.length; i++) {
+                expect(await this.pods[i].balanceOf(wallet1.address)).to.be.equals('0');
+                expect(await this.pods[i].balanceOf(wallet2.address)).to.be.equals(wallet2BalancedPods.indexOf(i) !== -1 ? ether('1') : '0');
+            }
         });
     });
 });
