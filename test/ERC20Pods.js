@@ -231,30 +231,42 @@ describe('ERC20Pods', function () {
     });
 
     describe('_updateBalances', function () {
+        async function initWrongPod () {
+            const Token = await ethers.getContractFactory('TokenMock');
+            const token = await Token.deploy('TOKEN_WPM', 'TKNWPM');
+            await token.deployed();
+
+            const WrongPodMock = await ethers.getContractFactory('WrongPodMock');
+            const wrongPod = await WrongPodMock.deploy('WrongPodMock', 'WPM', token.address);
+            await wrongPod.deployed();
+            return { wrongPod };
+        };
+
         beforeEach(async function () {
+            Object.assign(this, await initWrongPod());
             await this.erc20Pods.mint(wallet1.address, this.amount);
         });
 
         it('should not fail when updateBalance in pod reverts', async function () {
-            await this.pods[0].setIsRevert(true);
-            await expect(this.pods[0].updateBalances(wallet1.address, wallet2.address, this.amount))
-                .to.be.revertedWithCustomError(this.pods[0], 'PodsUpdateBalanceRevert');
-            await this.erc20Pods.addPod(this.pods[0].address);
-            expect(await this.erc20Pods.pods(wallet1.address)).to.have.deep.equals([this.pods[0].address]);
+            await this.wrongPod.setIsRevert(true);
+            await expect(this.wrongPod.updateBalances(wallet1.address, wallet2.address, this.amount))
+                .to.be.revertedWithCustomError(this.wrongPod, 'PodsUpdateBalanceRevert');
+            await this.erc20Pods.addPod(this.wrongPod.address);
+            expect(await this.erc20Pods.pods(wallet1.address)).to.have.deep.equals([this.wrongPod.address]);
         });
 
         it('should not fail when updateBalance in pod has OutOfGas', async function () {
-            await this.pods[0].setOutOfGas(true);
-            await this.erc20Pods.addPod(this.pods[0].address);
-            expect(await this.erc20Pods.pods(wallet1.address)).to.have.deep.equals([this.pods[0].address]);
+            await this.wrongPod.setOutOfGas(true);
+            await this.erc20Pods.addPod(this.wrongPod.address);
+            expect(await this.erc20Pods.pods(wallet1.address)).to.have.deep.equals([this.wrongPod.address]);
         });
 
         it('should not fail when updateBalance returns gas bomb @skip-on-coverage', async function () {
-            await this.pods[0].setReturnGasBomb(true);
-            const tx = await this.erc20Pods.addPod(this.pods[0].address);
+            await this.wrongPod.setReturnGasBomb(true);
+            const tx = await this.erc20Pods.addPod(this.wrongPod.address);
             const receipt = await tx.wait();
             expect(receipt.gasUsed).to.be.lt(272123); // 272123 with solidity instead of assembly
-            expect(await this.erc20Pods.pods(wallet1.address)).to.have.deep.equals([this.pods[0].address]);
+            expect(await this.erc20Pods.pods(wallet1.address)).to.have.deep.equals([this.wrongPod.address]);
         });
     });
 
