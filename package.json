@@ -51,6 +51,7 @@
   },
   "files": [
     "contracts/*.sol",
-    "contracts/interfaces/*.sol"
+    "contracts/interfaces/*.sol",
+    "contracts/mocks/*.sol"
   ]
 }
