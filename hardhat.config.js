@@ -1,9 +1,7 @@
 require('@nomiclabs/hardhat-ethers');
 require('@nomiclabs/hardhat-etherscan');
-require('@nomiclabs/hardhat-truffle5');
 require('@nomicfoundation/hardhat-chai-matchers');
 require('solidity-coverage');
-require('hardhat-dependency-compiler');
 require('hardhat-deploy');
 require('hardhat-gas-reporter');
 require('dotenv').config();
@@ -30,10 +28,5 @@ module.exports = {
     gasReporter: {
         enable: true,
         currency: 'USD',
-    },
-    dependencyCompiler: {
-        paths: [
-            '@1inch/solidity-utils/contracts/mocks/TokenMock.sol',
-        ],
     },
 };

@@ -18,8 +18,7 @@ describe('ERC20Pods', function () {
 
         const pods = [];
         for (let i = 0; i < POD_LIMITS; i++) {
-            const Token = await ethers.getContractFactory('TokenMock');
-            const token = await Token.deploy(`TOKEN_${i}`, `TKN${i}`);
+            const token = await Erc20PodsMock.deploy(`TOKEN_${i}`, `TKN${i}`, POD_LIMITS);
             await token.deployed();
             const PodMock = await ethers.getContractFactory('PodMock');
             pods[i] = await PodMock.deploy(`POD_TOKEN_${i}`, `PT${i}`, token.address);
