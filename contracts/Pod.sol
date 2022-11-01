@@ -2,9 +2,6 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
-
 import "./interfaces/IPod.sol";
 
 abstract contract Pod is IPod {
