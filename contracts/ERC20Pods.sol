@@ -16,6 +16,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
     error PodNotFound();
     error InvalidPodAddress();
     error PodsLimitReachedForAccount();
+    error InsufficientGas();
 
     uint256 private constant _POD_CALL_GAS_LIMIT = 200_000;
 
@@ -100,6 +101,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
     /// @dev try IPod(pod).updateBalances{gas: _POD_CALL_GAS_LIMIT}(from, to, amount) {} catch {}
     function _updateBalances(address pod, address from, address to, uint256 amount) private {
         bytes4 selector = IPod.updateBalances.selector;
+        bytes4 exception = InsufficientGas.selector;
         assembly {  // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
             mstore(ptr, selector)
@@ -107,6 +109,10 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
             mstore(add(ptr, 0x24), to)
             mstore(add(ptr, 0x44), amount)
 
+            if lt(div(mul(gas(), 63), 64), _POD_CALL_GAS_LIMIT) {
+                mstore(0, exception)
+                revert(0, 4)
+            }
             pop(call(_POD_CALL_GAS_LIMIT, pod, 0, ptr, 0x64, 0, 0))
         }
     }
