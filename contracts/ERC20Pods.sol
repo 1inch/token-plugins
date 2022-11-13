@@ -119,8 +119,8 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
 
     // ERC20 Overrides
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override virtual {
-        super._beforeTokenTransfer(from, to, amount);
+    function _afterTokenTransfer(address from, address to, uint256 amount) internal override virtual {
+        super._afterTokenTransfer(from, to, amount);
 
         if (amount > 0 && from != to) {
             address[] memory a = _pods[from].items.get();

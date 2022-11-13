@@ -291,7 +291,7 @@ describe('ERC20Pods', function () {
         });
     });
 
-    describe('_beforeTokenTransfer', function () {
+    describe('_afterTokenTransfer', function () {
         it('should not affect when amount is zero', async function () {
             const { erc20Pods, pods, podsBalancesBeforeWallet1 } = await loadFixture(initAndMintAndAddPods);
             await erc20Pods.transfer(wallet2.address, '0');
