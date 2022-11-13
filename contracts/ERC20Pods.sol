@@ -119,12 +119,14 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
         if (amount > 0 && from != to) {
             address[] memory a = _pods[from].items.get();
             address[] memory b = _pods[to].items.get();
+            uint256 aLength = a.length;
+            uint256 bLength = b.length;
 
-            for (uint256 i = 0; i < a.length; i++) {
+            for (uint256 i = 0; i < aLength; i++) {
                 address pod = a[i];
 
                 uint256 j;
-                for (j = 0; j < b.length; j++) {
+                for (j = 0; j < bLength; j++) {
                     if (pod == b[j]) {
                         // Both parties are participating of the same Pod
                         _updateBalances(pod, from, to, amount);
@@ -133,13 +135,13 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
                     }
                 }
 
-                if (j == b.length) {
+                if (j == bLength) {
                     // Sender is participating in a Pod, but receiver is not
                     _updateBalances(pod, from, address(0), amount);
                 }
             }
 
-            for (uint256 j = 0; j < b.length; j++) {
+            for (uint256 j = 0; j < bLength; j++) {
                 address pod = b[j];
                 if (pod != address(0)) {
                     // Receiver is participating in a Pod, but sender is not
