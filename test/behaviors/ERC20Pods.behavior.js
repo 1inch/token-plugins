@@ -366,6 +366,16 @@ function shouldBehaveLikeERC20Pods (initContracts) {
                 expect(await erc20Pods.balanceOf(wallet3.address)).to.be.equals(wallet3beforeBalance.add(amount));
             });
         });
+
+        it('should not add more pods than limit', async function () {
+            const { erc20Pods, pods } = await loadFixture(initContracts);
+            const podsLimit = await erc20Pods.podsLimit();
+            for (let i = 0; i < podsLimit; i++) {
+                await erc20Pods.addPod(pods[i].address);
+            }
+            await expect(erc20Pods.addPod(constants.EEE_ADDRESS))
+                .to.be.revertedWithCustomError(erc20Pods, 'PodsLimitReachedForAccount');
+        });
     });
 };
 

@@ -1,5 +1,4 @@
-const { ether, expect, constants } = require('@1inch/solidity-utils');
-const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
+const { ether } = require('@1inch/solidity-utils');
 const { ethers } = require('hardhat');
 const { shouldBehaveLikeERC20Pods } = require('./behaviors/ERC20Pods.behavior');
 
@@ -24,13 +23,4 @@ describe('ERC20Pods', function () {
     };
 
     shouldBehaveLikeERC20Pods(initContracts);
-
-    it('should not add pod amounts more than limit', async function () {
-        const { erc20Pods, pods } = await loadFixture(initContracts);
-        for (let i = 0; i < POD_LIMITS; i++) {
-            await erc20Pods.addPod(pods[i].address);
-        }
-        await expect(erc20Pods.addPod(constants.EEE_ADDRESS))
-            .to.be.revertedWithCustomError(erc20Pods, 'PodsLimitReachedForAccount');
-    });
 });
