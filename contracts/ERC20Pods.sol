@@ -119,37 +119,41 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
 
     // ERC20 Overrides
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override virtual {
-        super._beforeTokenTransfer(from, to, amount);
+    function _afterTokenTransfer(address from, address to, uint256 amount) internal override virtual {
+        super._afterTokenTransfer(from, to, amount);
 
-        if (amount > 0 && from != to) {
-            address[] memory a = _pods[from].items.get();
-            address[] memory b = _pods[to].items.get();
+        unchecked {
+            if (amount > 0 && from != to) {
+                address[] memory a = _pods[from].items.get();
+                address[] memory b = _pods[to].items.get();
+                uint256 aLength = a.length;
+                uint256 bLength = b.length;
 
-            for (uint256 i = 0; i < a.length; i++) {
-                address pod = a[i];
+                for (uint256 i = 0; i < aLength; i++) {
+                    address pod = a[i];
 
-                uint256 j;
-                for (j = 0; j < b.length; j++) {
-                    if (pod == b[j]) {
-                        // Both parties are participating of the same Pod
-                        _updateBalances(pod, from, to, amount);
-                        b[j] = address(0);
-                        break;
+                    uint256 j;
+                    for (j = 0; j < bLength; j++) {
+                        if (pod == b[j]) {
+                            // Both parties are participating of the same Pod
+                            _updateBalances(pod, from, to, amount);
+                            b[j] = address(0);
+                            break;
+                        }
+                    }
+
+                    if (j == bLength) {
+                        // Sender is participating in a Pod, but receiver is not
+                        _updateBalances(pod, from, address(0), amount);
                     }
                 }
 
-                if (j == b.length) {
-                    // Sender is participating in a Pod, but receiver is not
-                    _updateBalances(pod, from, address(0), amount);
-                }
-            }
-
-            for (uint256 j = 0; j < b.length; j++) {
-                address pod = b[j];
-                if (pod != address(0)) {
-                    // Receiver is participating in a Pod, but sender is not
-                    _updateBalances(pod, address(0), to, amount);
+                for (uint256 j = 0; j < bLength; j++) {
+                    address pod = b[j];
+                    if (pod != address(0)) {
+                        // Receiver is participating in a Pod, but sender is not
+                        _updateBalances(pod, address(0), to, amount);
+                    }
                 }
             }
         }
