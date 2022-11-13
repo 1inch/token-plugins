@@ -84,9 +84,10 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
 
     function _removeAllPods(address account) internal virtual {
         address[] memory items = _pods[account].items.get();
-        uint256 balance = balanceOf(account);
         unchecked {
             for (uint256 i = items.length; i > 0; i--) {
+                // _updateBalances can change balance of account, so we need to query balanceOf inside the loop
+                uint256 balance = balanceOf(account);
                 if (balance > 0) {
                     _updateBalances(items[i - 1], account, address(0), balance);
                 }
