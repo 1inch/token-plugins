@@ -1,6 +1,6 @@
 {
   "name": "@1inch/erc20-pods",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "ERC20 extension enabling external smart contract based Pods to track balances of those users who opted-in to these Pods",
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "@1inch/solidity-utils": "2.2.2",
-    "@openzeppelin/contracts": "4.7.3"
+    "@openzeppelin/contracts": "4.8.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "1.0.4",
