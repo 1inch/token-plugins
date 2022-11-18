@@ -6,89 +6,99 @@ import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
 
 import "./interfaces/IPod.sol";
 
-library TokenPodsLib {
+abstract contract TokenPods {
     using AddressSet for AddressSet.Data;
     using AddressArray for AddressArray.Data;
 
+    error PodsLimitReachedForAccount();
     error PodAlreadyAdded();
     error PodNotFound();
     error InvalidPodAddress();
     error InsufficientGas();
 
-    struct Data {
-        mapping(address => AddressSet.Data) _pods;
-    }
-
     uint256 private constant _POD_CALL_GAS_LIMIT = 200_000;
 
-    function hasPod(Data storage self, address account, address pod) internal view returns(bool) {
-        return self._pods[account].contains(pod);
+    uint256 public immutable podsLimit;
+
+    mapping(address => AddressSet.Data) private _pods;
+
+    constructor(uint256 podsLimit_) {
+        podsLimit = podsLimit_;
     }
 
-    function podsCount(Data storage self, address account) internal view returns(uint256) {
-        return self._pods[account].length();
+    function hasPod(address account, address pod) public view virtual returns(bool) {
+        return _pods[account].contains(pod);
     }
 
-    function podAt(Data storage self, address account, uint256 index) internal view returns(address) {
-        return self._pods[account].at(index);
+    function podsCount(address account) public view virtual returns(uint256) {
+        return _pods[account].length();
     }
 
-    function pods(Data storage self, address account) internal view returns(address[] memory) {
-        return self._pods[account].items.get();
+    function podAt(address account, uint256 index) public view virtual returns(address) {
+        return _pods[account].at(index);
     }
 
-    function podBalanceOf(Data storage self, address account, address pod, function(address) internal view returns(uint256) balanceOf) internal view returns(uint256) {
-        if (self._pods[account].contains(pod)) {
-            return balanceOf(account);
+    function pods(address account) public view virtual returns(address[] memory) {
+        return _pods[account].items.get();
+    }
+
+    function podBalanceOf(address pod, address account) public view virtual returns(uint256) {
+        if (_pods[account].contains(pod)) {
+            return _balanceOf(account);
         }
         return 0;
     }
 
-    function addPod(Data storage self, address account, address pod, uint256 balance) internal returns(uint256) {
-        return _addPod(self, account, pod, balance);
+    function addPod(address pod) public virtual {
+        if (_addPod(msg.sender, pod) > podsLimit) revert PodsLimitReachedForAccount();
     }
 
-    function removePod(Data storage self, address account, address pod, uint256 balance) internal {
-        _removePod(self, account, pod, balance);
+    function removePod(address pod) public virtual {
+        _removePod(msg.sender, pod);
     }
 
-    function removeAllPods(Data storage self, address account, uint256 balance) internal {
-        _removeAllPods(self, account, balance);
+    function removeAllPods() public virtual {
+        _removeAllPods(msg.sender);
     }
 
-    function _addPod(Data storage self, address account, address pod, uint256 balance) private returns(uint256) {
+    function _addPod(address account, address pod) internal returns(uint256) {
         if (pod == address(0)) revert InvalidPodAddress();
-        if (!self._pods[account].add(pod)) revert PodAlreadyAdded();
+        if (!_pods[account].add(pod)) revert PodAlreadyAdded();
+        uint256 balance = _balanceOf(account);
         if (balance > 0) {
-            _updateBalances(pod, address(0), account, balance);
+            _notifyPod(pod, address(0), account, balance);
         }
-        return self._pods[account].length();
+        return _pods[account].length();
     }
 
-    function _removePod(Data storage self, address account, address pod, uint256 balance) private {
-        if (!self._pods[account].remove(pod)) revert PodNotFound();
+    function _removePod(address account, address pod) internal virtual {
+        if (!_pods[account].remove(pod)) revert PodNotFound();
+        uint256 balance = _balanceOf(account);
         if (balance > 0) {
-            _updateBalances(pod, account, address(0), balance);
+            _notifyPod(pod, account, address(0), balance);
         }
     }
 
-    function _removeAllPods(Data storage self, address account, uint256 balance) private {
-        address[] memory items = self._pods[account].items.get();
+    function _removeAllPods(address account) internal virtual {
+        address[] memory items = _pods[account].items.get();
+        uint256 balance = _balanceOf(account);
         unchecked {
             for (uint256 i = items.length; i > 0; i--) {
                 if (balance > 0) {
-                    _updateBalances(items[i - 1], account, address(0), balance);
+                    _notifyPod(items[i - 1], account, address(0), balance);
                 }
-                self._pods[account].remove(items[i - 1]);
+                _pods[account].remove(items[i - 1]);
             }
         }
     }
 
-    function updateBalances(Data storage self, address from, address to, uint256 amount) internal {
+    function _balanceOf(address account) internal view virtual returns(uint256);
+
+    function _updatePodsBalances(address from, address to, uint256 amount) internal virtual {
         unchecked {
             if (amount > 0 && from != to) {
-                address[] memory a = self._pods[from].items.get();
-                address[] memory b = self._pods[to].items.get();
+                address[] memory a = _pods[from].items.get();
+                address[] memory b = _pods[to].items.get();
                 uint256 aLength = a.length;
                 uint256 bLength = b.length;
 
@@ -99,7 +109,7 @@ library TokenPodsLib {
                     for (j = 0; j < bLength; j++) {
                         if (pod == b[j]) {
                             // Both parties are participating of the same Pod
-                            _updateBalances(pod, from, to, amount);
+                            _notifyPod(pod, from, to, amount);
                             b[j] = address(0);
                             break;
                         }
@@ -107,7 +117,7 @@ library TokenPodsLib {
 
                     if (j == bLength) {
                         // Sender is participating in a Pod, but receiver is not
-                        _updateBalances(pod, from, address(0), amount);
+                        _notifyPod(pod, from, address(0), amount);
                     }
                 }
 
@@ -115,7 +125,7 @@ library TokenPodsLib {
                     address pod = b[j];
                     if (pod != address(0)) {
                         // Receiver is participating in a Pod, but sender is not
-                        _updateBalances(pod, address(0), to, amount);
+                        _notifyPod(pod, address(0), to, amount);
                     }
                 }
             }
@@ -125,7 +135,7 @@ library TokenPodsLib {
     /// @notice Assembly implementation of the gas limited call to avoid return gas bomb,
     // moreover call to a destructed pod would also revert even inside try-catch block in Solidity 0.8.17
     /// @dev try IPod(pod).updateBalances{gas: _POD_CALL_GAS_LIMIT}(from, to, amount) {} catch {}
-    function _updateBalances(address pod, address from, address to, uint256 amount) private {
+    function _notifyPod(address pod, address from, address to, uint256 amount) private {
         bytes4 selector = IPod.updateBalances.selector;
         bytes4 exception = InsufficientGas.selector;
         assembly {  // solhint-disable-line no-inline-assembly
