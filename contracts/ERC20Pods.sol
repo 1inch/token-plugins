@@ -37,11 +37,8 @@ abstract contract ERC20Pods is ERC20, ITokenPods {
         return _pods.pods(account);
     }
 
-    function podBalanceOf(address pod, address account) public view returns(uint256) {
-        if (_pods.hasPod(account, pod)) {
-            return balanceOf(account);
-        }
-        return 0;
+    function podBalanceOf(address pod, address account) public view virtual returns(uint256) {
+        return _pods.podBalanceOf(account, pod, balanceOf);
     }
 
     function addPod(address pod) public virtual {

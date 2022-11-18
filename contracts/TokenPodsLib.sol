@@ -37,6 +37,13 @@ library TokenPodsLib {
         return self._pods[account].items.get();
     }
 
+    function podBalanceOf(Data storage self, address account, address pod, function(address) internal view returns(uint256) balanceOf) internal view returns(uint256) {
+        if (self._pods[account].contains(pod)) {
+            return balanceOf(account);
+        }
+        return 0;
+    }
+
     function addPod(Data storage self, address account, address pod, uint256 balance) internal returns(uint256) {
         return _addPod(self, account, pod, balance);
     }
