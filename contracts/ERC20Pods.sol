@@ -5,17 +5,17 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
 
-import "./interfaces/IERC20Pods.sol";
-import "./PodsLib.sol";
+import "./interfaces/ITokenPods.sol";
+import "./TokenPodsLib.sol";
 
-abstract contract ERC20Pods is ERC20, IERC20Pods {
-    using PodsLib for PodsLib.Data;
+abstract contract ERC20Pods is ERC20, ITokenPods {
+    using TokenPodsLib for TokenPodsLib.Data;
 
     error PodsLimitReachedForAccount();
 
     uint256 public immutable podsLimit;
 
-    PodsLib.Data private _pods;
+    TokenPodsLib.Data private _pods;
 
     constructor(uint256 podsLimit_) {
         podsLimit = podsLimit_;

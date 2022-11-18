@@ -6,7 +6,7 @@ import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
 
 import "./interfaces/IPod.sol";
 
-library PodsLib {
+library TokenPodsLib {
     using AddressSet for AddressSet.Data;
     using AddressArray for AddressArray.Data;
 
