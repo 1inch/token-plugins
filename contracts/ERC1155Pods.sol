@@ -64,8 +64,10 @@ abstract contract ERC1155Pods is ERC1155, IERC1155Pods {
     ) internal override virtual {
         super._afterTokenTransfer(operator, from, to, ids, amounts, data);
 
-        for (uint256 i = 0; i < ids.length; i++) {
-            _pods[ids[i]].updateBalancesWithTokenId(from, to, amounts[i], ids[i]);
+        unchecked {
+            for (uint256 i = 0; i < ids.length; i++) {
+                _pods[ids[i]].updateBalancesWithTokenId(from, to, amounts[i], ids[i]);
+            }
         }
     }
 }
