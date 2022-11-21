@@ -5,10 +5,10 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
 
-import "./interfaces/ITokenPods.sol";
+import "./interfaces/IERC20Pods.sol";
 import "./TokenPodsLib.sol";
 
-abstract contract ERC20Pods is ERC20, ITokenPods {
+abstract contract ERC20Pods is ERC20, IERC20Pods {
     using TokenPodsLib for TokenPodsLib.Data;
 
     error PodsLimitReachedForAccount();
@@ -38,7 +38,7 @@ abstract contract ERC20Pods is ERC20, ITokenPods {
     }
 
     function podBalanceOf(address pod, address account) public view virtual returns(uint256) {
-        return _pods.podBalanceOf(account, pod, balanceOf);
+        return _pods.podBalanceOf(account, pod, balanceOf(account));
     }
 
     function addPod(address pod) public virtual {

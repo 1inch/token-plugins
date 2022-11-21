@@ -37,9 +37,9 @@ library TokenPodsLib {
         return self._pods[account].items.get();
     }
 
-    function podBalanceOf(Data storage self, address account, address pod, function(address) internal view returns(uint256) balanceOf) internal view returns(uint256) {
+    function podBalanceOf(Data storage self, address account, address pod, uint256 balance) internal view returns(uint256) {
         if (self._pods[account].contains(pod)) {
-            return balanceOf(account);
+            return balance;
         }
         return 0;
     }
@@ -60,7 +60,7 @@ library TokenPodsLib {
         if (pod == address(0)) revert InvalidPodAddress();
         if (!self._pods[account].add(pod)) revert PodAlreadyAdded();
         if (balance > 0) {
-            _updateBalances(pod, address(0), account, balance);
+            _notifyPod(pod, address(0), account, balance, 0, false);
         }
         return self._pods[account].length();
     }
@@ -68,7 +68,7 @@ library TokenPodsLib {
     function _removePod(Data storage self, address account, address pod, uint256 balance) private {
         if (!self._pods[account].remove(pod)) revert PodNotFound();
         if (balance > 0) {
-            _updateBalances(pod, account, address(0), balance);
+            _notifyPod(pod, account, address(0), balance, 0, false);
         }
     }
 
@@ -77,7 +77,7 @@ library TokenPodsLib {
         unchecked {
             for (uint256 i = items.length; i > 0; i--) {
                 if (balance > 0) {
-                    _updateBalances(items[i - 1], account, address(0), balance);
+                    _notifyPod(items[i - 1], account, address(0), balance, 0, false);
                 }
                 self._pods[account].remove(items[i - 1]);
             }
@@ -85,6 +85,14 @@ library TokenPodsLib {
     }
 
     function updateBalances(Data storage self, address from, address to, uint256 amount) internal {
+        _updateBalances(self, from, to, amount, 0, false);
+    }
+
+    function updateBalancesWithTokenId(Data storage self, address from, address to, uint256 amount, uint256 id) internal {
+        _updateBalances(self, from, to, amount, id, true);
+    }
+
+    function _updateBalances(Data storage self, address from, address to, uint256 amount, uint256 id, bool hasId) internal {
         unchecked {
             if (amount > 0 && from != to) {
                 address[] memory a = self._pods[from].items.get();
@@ -99,7 +107,7 @@ library TokenPodsLib {
                     for (j = 0; j < bLength; j++) {
                         if (pod == b[j]) {
                             // Both parties are participating of the same Pod
-                            _updateBalances(pod, from, to, amount);
+                            _notifyPod(pod, from, to, amount, id, hasId);
                             b[j] = address(0);
                             break;
                         }
@@ -107,7 +115,7 @@ library TokenPodsLib {
 
                     if (j == bLength) {
                         // Sender is participating in a Pod, but receiver is not
-                        _updateBalances(pod, from, address(0), amount);
+                        _notifyPod(pod, from, address(0), amount, id, hasId);
                     }
                 }
 
@@ -115,7 +123,7 @@ library TokenPodsLib {
                     address pod = b[j];
                     if (pod != address(0)) {
                         // Receiver is participating in a Pod, but sender is not
-                        _updateBalances(pod, address(0), to, amount);
+                        _notifyPod(pod, address(0), to, amount, id, hasId);
                     }
                 }
             }
@@ -125,8 +133,11 @@ library TokenPodsLib {
     /// @notice Assembly implementation of the gas limited call to avoid return gas bomb,
     // moreover call to a destructed pod would also revert even inside try-catch block in Solidity 0.8.17
     /// @dev try IPod(pod).updateBalances{gas: _POD_CALL_GAS_LIMIT}(from, to, amount) {} catch {}
-    function _updateBalances(address pod, address from, address to, uint256 amount) private {
+    function _notifyPod(address pod, address from, address to, uint256 amount, uint256 id, bool hasId) private {
         bytes4 selector = IPod.updateBalances.selector;
+        if (hasId) {
+            selector = IPod.updateBalancesWithTokenId.selector;
+        }
         bytes4 exception = InsufficientGas.selector;
         assembly {  // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
@@ -134,12 +145,15 @@ library TokenPodsLib {
             mstore(add(ptr, 0x04), from)
             mstore(add(ptr, 0x24), to)
             mstore(add(ptr, 0x44), amount)
+            if hasId {
+                mstore(add(ptr, 0x64), id)
+            }
 
             if lt(div(mul(gas(), 63), 64), _POD_CALL_GAS_LIMIT) {
                 mstore(0, exception)
                 revert(0, 4)
             }
-            pop(call(_POD_CALL_GAS_LIMIT, pod, 0, ptr, 0x64, 0, 0))
+            pop(call(_POD_CALL_GAS_LIMIT, pod, 0, ptr, add(0x64, mul(hasId, 0x20)), 0, 0))
         }
     }
 }

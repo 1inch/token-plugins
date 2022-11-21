@@ -5,16 +5,16 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 import "./interfaces/IERC1155Pods.sol";
-import "./PodsLib.sol";
+import "./TokenPodsLib.sol";
 
 abstract contract ERC1155Pods is ERC1155, IERC1155Pods {
-    using PodsLib for PodsLib.Data;
+    using TokenPodsLib for TokenPodsLib.Data;
 
     error PodsLimitReachedForAccount();
 
     uint256 public immutable podsLimit;
 
-    mapping(uint256 => PodsLib.Data) private _pods;
+    mapping(uint256 => TokenPodsLib.Data) private _pods;
 
     constructor(uint256 podsLimit_) {
         podsLimit = podsLimit_;
@@ -37,10 +37,7 @@ abstract contract ERC1155Pods is ERC1155, IERC1155Pods {
     }
 
     function podBalanceOf(address pod, address account, uint256 id) public view returns(uint256) {
-        if (_pods[id].hasPod(account, pod)) {
-            return balanceOf(account, id);
-        }
-        return 0;
+        return _pods[id].podBalanceOf(account, pod, balanceOf(msg.sender, id));
     }
 
     function addPod(address pod, uint256 id) public virtual {
@@ -68,7 +65,7 @@ abstract contract ERC1155Pods is ERC1155, IERC1155Pods {
         super._afterTokenTransfer(operator, from, to, ids, amounts, data);
 
         for (uint256 i = 0; i < ids.length; i++) {
-            _pods[ids[i]].updateBalances(from, to, amounts[i]);
+            _pods[ids[i]].updateBalancesWithTokenId(from, to, amounts[i], ids[i]);
         }
     }
 }
