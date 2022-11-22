@@ -7,14 +7,16 @@ import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
 
 import "./interfaces/IERC20Pods.sol";
 import "./TokenPodsLib.sol";
+import "./libs/ReentrancyGuard.sol";
 
-abstract contract ERC20Pods is ERC20, IERC20Pods {
+abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     using TokenPodsLib for TokenPodsLib.Data;
 
     error PodsLimitReachedForAccount();
 
     uint256 public immutable podsLimit;
 
+    ReentrancyGuardLib.Data private _guard;
     TokenPodsLib.Data private _pods;
 
     constructor(uint256 podsLimit_) {
@@ -37,7 +39,11 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
         return _pods.pods(account);
     }
 
-    function podBalanceOf(address pod, address account) public view virtual returns(uint256) {
+    function balanceOf(address account) public nonReentrantView(_guard) view override(IERC20, ERC20) virtual returns(uint256) {
+        return super.balanceOf(account);
+    }
+
+    function podBalanceOf(address pod, address account) public nonReentrantView(_guard) view virtual returns(uint256) {
         return _pods.podBalanceOf(account, pod, balanceOf(account));
     }
 

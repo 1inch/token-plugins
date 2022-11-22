@@ -6,14 +6,16 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 import "./interfaces/IERC1155Pods.sol";
 import "./TokenPodsLib.sol";
+import "./libs/ReentrancyGuard.sol";
 
-abstract contract ERC1155Pods is ERC1155, IERC1155Pods {
+abstract contract ERC1155Pods is ERC1155, IERC1155Pods, ReentrancyGuardExt {
     using TokenPodsLib for TokenPodsLib.Data;
 
     error PodsLimitReachedForAccount();
 
     uint256 public immutable podsLimit;
 
+    ReentrancyGuardLib.Data private _guard;
     mapping(uint256 => TokenPodsLib.Data) private _pods;
 
     constructor(uint256 podsLimit_) {
@@ -36,7 +38,11 @@ abstract contract ERC1155Pods is ERC1155, IERC1155Pods {
         return _pods[id].pods(account);
     }
 
-    function podBalanceOf(address pod, address account, uint256 id) public view returns(uint256) {
+    function balanceOf(address account, uint256 id) public nonReentrantView(_guard) view override(IERC1155, ERC1155) virtual returns(uint256) {
+        return super.balanceOf(account, id);
+    }
+
+    function podBalanceOf(address pod, address account, uint256 id) public nonReentrantView(_guard) view returns(uint256) {
         return _pods[id].podBalanceOf(account, pod, balanceOf(msg.sender, id));
     }
 

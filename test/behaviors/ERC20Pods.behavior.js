@@ -258,7 +258,7 @@ function shouldBehaveLikeERC20Pods (initContracts) {
                 await wrongPod.setReturnGasBomb(true);
                 const tx = await erc20Pods.addPod(wrongPod.address);
                 const receipt = await tx.wait();
-                expect(receipt.gasUsed).to.be.lt(272123); // 272123 with solidity instead of assembly
+                expect(receipt.gasUsed).to.be.lt(274286); // 274286 with solidity instead of assembly
                 expect(await erc20Pods.pods(wallet1.address)).to.be.deep.equals([wrongPod.address]);
             });
         });
