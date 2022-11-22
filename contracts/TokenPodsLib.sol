@@ -92,7 +92,7 @@ library TokenPodsLib {
         _updateBalances(self, from, to, amount, id, true);
     }
 
-    function _updateBalances(Data storage self, address from, address to, uint256 amount, uint256 id, bool hasId) internal {
+    function _updateBalances(Data storage self, address from, address to, uint256 amount, uint256 id, bool hasId) private {
         unchecked {
             if (amount > 0 && from != to) {
                 address[] memory a = self._pods[from].items.get();
