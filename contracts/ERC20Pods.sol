@@ -11,6 +11,7 @@ import "./libs/ReentrancyGuard.sol";
 
 abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     using TokenPodsLib for TokenPodsLib.Data;
+    using ReentrancyGuardLib for ReentrancyGuardLib.Data;
 
     error PodsLimitReachedForAccount();
 
@@ -21,6 +22,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
 
     constructor(uint256 podsLimit_) {
         podsLimit = podsLimit_;
+        _guard.init();
     }
 
     function hasPod(address account, address pod) public view virtual returns(bool) {
@@ -61,7 +63,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
 
     // ERC20 Overrides
 
-    function _afterTokenTransfer(address from, address to, uint256 amount) internal override virtual {
+    function _afterTokenTransfer(address from, address to, uint256 amount) internal nonReentrant(_guard) override virtual {
         super._afterTokenTransfer(from, to, amount);
         _pods.updateBalances(from, to, amount);
     }

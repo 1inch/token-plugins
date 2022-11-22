@@ -10,6 +10,7 @@ import "./libs/ReentrancyGuard.sol";
 
 abstract contract ERC1155Pods is ERC1155, IERC1155Pods, ReentrancyGuardExt {
     using TokenPodsLib for TokenPodsLib.Data;
+    using ReentrancyGuardLib for ReentrancyGuardLib.Data;
 
     error PodsLimitReachedForAccount();
 
@@ -20,6 +21,7 @@ abstract contract ERC1155Pods is ERC1155, IERC1155Pods, ReentrancyGuardExt {
 
     constructor(uint256 podsLimit_) {
         podsLimit = podsLimit_;
+        _guard.init();
     }
 
     function hasPod(address account, address pod, uint256 id) public view virtual returns(bool) {
@@ -67,7 +69,7 @@ abstract contract ERC1155Pods is ERC1155, IERC1155Pods, ReentrancyGuardExt {
         uint256[] memory ids,
         uint256[] memory amounts,
         bytes memory data
-    ) internal override virtual {
+    ) internal nonReentrant(_guard) override virtual {
         super._afterTokenTransfer(operator, from, to, ids, amounts, data);
 
         unchecked {
