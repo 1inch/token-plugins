@@ -7,10 +7,12 @@ import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
 
 import "./interfaces/IERC20Pods.sol";
 import "./interfaces/IPod.sol";
+import "./libs/ReentrancyGuard.sol";
 
-abstract contract ERC20Pods is ERC20, IERC20Pods {
+abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     using AddressSet for AddressSet.Data;
     using AddressArray for AddressArray.Data;
+    using ReentrancyGuardLib for ReentrancyGuardLib.Data;
 
     error PodAlreadyAdded();
     error PodNotFound();
@@ -22,10 +24,12 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
 
     uint256 public immutable podsLimit;
 
+    ReentrancyGuardLib.Data private _guard;
     mapping(address => AddressSet.Data) private _pods;
 
     constructor(uint256 podsLimit_) {
         podsLimit = podsLimit_;
+        _guard.init();
     }
 
     function hasPod(address account, address pod) public view virtual returns(bool) {
@@ -44,7 +48,11 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
         return _pods[account].items.get();
     }
 
-    function podBalanceOf(address pod, address account) public view returns(uint256) {
+    function balanceOf(address account) public nonReentrantView(_guard) view override(IERC20, ERC20) returns(uint256) {
+        return super.balanceOf(account);
+    }
+
+    function podBalanceOf(address pod, address account) public nonReentrantView(_guard) view returns(uint256) {
         if (hasPod(account, pod)) {
             return balanceOf(account);
         }
@@ -119,7 +127,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods {
 
     // ERC20 Overrides
 
-    function _afterTokenTransfer(address from, address to, uint256 amount) internal override virtual {
+    function _afterTokenTransfer(address from, address to, uint256 amount) internal nonReentrant(_guard) override virtual {
         super._afterTokenTransfer(from, to, amount);
 
         unchecked {
