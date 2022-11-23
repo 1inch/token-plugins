@@ -12,10 +12,8 @@ describe('ERC20Pods', function () {
 
         const pods = [];
         for (let i = 0; i < POD_LIMITS; i++) {
-            const token = await ERC20PodsMock.deploy(`TOKEN_${i}`, `TKN${i}`, POD_LIMITS);
-            await token.deployed();
             const PodMock = await ethers.getContractFactory('PodMock');
-            pods[i] = await PodMock.deploy(`POD_TOKEN_${i}`, `PT${i}`, token.address);
+            pods[i] = await PodMock.deploy(`POD_TOKEN_${i}`, `PT${i}`, erc20Pods.address);
             await pods[i].deployed();
         }
         const amount = ether('1');
