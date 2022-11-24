@@ -45,7 +45,7 @@ abstract contract ERC1155Pods is ERC1155, IERC1155Pods, ReentrancyGuardExt {
     }
 
     function podBalanceOf(address pod, address account, uint256 id) public nonReentrantView(_guard) view returns(uint256) {
-        return _pods[id].podBalanceOf(account, pod, balanceOf(msg.sender, id));
+        return _pods[id].podBalanceOf(account, pod, super.balanceOf(msg.sender, id));
     }
 
     function addPod(address pod, uint256 id) public virtual {

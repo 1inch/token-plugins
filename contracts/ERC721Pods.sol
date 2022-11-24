@@ -47,7 +47,7 @@ abstract contract ERC721Pods is ERC721, IERC721Pods, ReentrancyGuardExt {
     }
 
     function podBalanceOf(address pod, address account) public nonReentrantView(_guard) view virtual returns(uint256) {
-        return _pods.podBalanceOf(account, pod, balanceOf(account));
+        return _pods.podBalanceOf(account, pod, super.balanceOf(account));
     }
 
     function addPod(address pod) public virtual {
