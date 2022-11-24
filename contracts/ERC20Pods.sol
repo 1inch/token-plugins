@@ -21,7 +21,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     error InsufficientGas();
 
     uint256 public immutable podsLimit;
-    uint256 private immutable podCallGasLimit;
+    uint256 public immutable podCallGasLimit;
 
     ReentrancyGuardLib.Data private _guard;
     mapping(address => AddressSet.Data) private _pods;
