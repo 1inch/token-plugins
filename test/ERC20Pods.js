@@ -43,7 +43,7 @@ describe('ERC20Pods', function () {
         await wrongPod.setReturnGasBomb(true);
         const tx = await erc20Pods.addPod(wrongPod.address);
         const receipt = await tx.wait();
-        expect(receipt.gasUsed).to.be.lt(274168);
+        expect(receipt.gasUsed).to.be.lt(274286);
         expect(await erc20Pods.pods(wallet1.address)).to.have.deep.equals([wrongPod.address]);
     });
 });
