@@ -32,7 +32,6 @@ library ReentrancyGuardLib {
 
 contract ReentrancyGuardExt {
     using ReentrancyGuardLib for ReentrancyGuardLib.Data;
-    error AccessDenied();
 
     modifier nonReentrant(ReentrancyGuardLib.Data storage self) {
         self.enter();
