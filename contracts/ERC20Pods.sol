@@ -20,15 +20,15 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     error PodsLimitReachedForAccount();
     error InsufficientGas();
 
-    uint256 private constant _POD_CALL_GAS_LIMIT = 200_000;
-
     uint256 public immutable podsLimit;
+    uint256 private immutable podCallGasLimit;
 
     ReentrancyGuardLib.Data private _guard;
     mapping(address => AddressSet.Data) private _pods;
 
-    constructor(uint256 podsLimit_) {
+    constructor(uint256 podsLimit_, uint256 podCallGasLimit_) {
         podsLimit = podsLimit_;
+        podCallGasLimit = podCallGasLimit_;
         _guard.init();
     }
 
@@ -110,6 +110,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     function _updateBalances(address pod, address from, address to, uint256 amount) private {
         bytes4 selector = IPod.updateBalances.selector;
         bytes4 exception = InsufficientGas.selector;
+        uint256 gasLimit = podCallGasLimit;
         assembly {  // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
             mstore(ptr, selector)
@@ -117,11 +118,11 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
             mstore(add(ptr, 0x24), to)
             mstore(add(ptr, 0x44), amount)
 
-            if lt(div(mul(gas(), 63), 64), _POD_CALL_GAS_LIMIT) {
+            if lt(div(mul(gas(), 63), 64), gasLimit) {
                 mstore(0, exception)
                 revert(0, 4)
             }
-            pop(call(_POD_CALL_GAS_LIMIT, pod, 0, ptr, 0x64, 0, 0))
+            pop(call(gasLimit, pod, 0, ptr, 0x64, 0, 0))
         }
     }
 
