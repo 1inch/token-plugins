@@ -252,15 +252,6 @@ function shouldBehaveLikeERC20Pods (initContracts) {
                 await erc20Pods.addPod(wrongPod.address);
                 expect(await erc20Pods.pods(wallet1.address)).to.be.deep.equals([wrongPod.address]);
             });
-
-            it('should not fail when updateBalance returns gas bomb @skip-on-coverage', async function () {
-                const { erc20Pods, wrongPod } = await loadFixture(initWrongPodAndMint);
-                await wrongPod.setReturnGasBomb(true);
-                const tx = await erc20Pods.addPod(wrongPod.address);
-                const receipt = await tx.wait();
-                expect(receipt.gasUsed).to.be.lt(274286); // 274286 with solidity instead of assembly
-                expect(await erc20Pods.pods(wallet1.address)).to.be.deep.equals([wrongPod.address]);
-            });
         });
 
         describe('_afterTokenTransfer', function () {

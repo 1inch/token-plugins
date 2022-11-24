@@ -46,7 +46,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     }
 
     function podBalanceOf(address pod, address account) public nonReentrantView(_guard) view virtual returns(uint256) {
-        return _pods.podBalanceOf(account, pod, balanceOf(account));
+        return _pods.podBalanceOf(account, pod, super.balanceOf(account));
     }
 
     function addPod(address pod) public virtual {
