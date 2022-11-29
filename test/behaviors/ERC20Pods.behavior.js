@@ -5,10 +5,10 @@ const { ethers } = require('hardhat');
 function shouldBehaveLikeERC20Pods (initContracts) {
     // Behavior test scenarios
     describe('should behave like ERC20 Pods', function () {
-        let wallet1, wallet2, wallet3;
+        let wallet1, wallet2;
 
         before(async function () {
-            [wallet1, wallet2, wallet3] = await ethers.getSigners();
+            [wallet1, wallet2] = await ethers.getSigners();
         });
 
         async function initAndMint () {
@@ -31,17 +31,6 @@ function shouldBehaveLikeERC20Pods (initContracts) {
             await erc20Pods.connect(wallet1).addPod(pods[0].address);
             await erc20Pods.connect(wallet2).addPod(pods[0].address);
             return { erc20Pods, pods, amount };
-        };
-
-        async function initAndMintAndAddPods () {
-            const { erc20Pods, pods, amount } = await initAndMint();
-            const podsBalancesBeforeWallet1 = [];
-            for (let i = 0; i < pods.length; i++) {
-                await erc20Pods.connect(wallet1).addPod(pods[i].address);
-                await pods[i].mint(wallet1.address, ether(i.toString()));
-                podsBalancesBeforeWallet1[i] = await pods[i].balanceOf(wallet1.address);
-            }
-            return { erc20Pods, pods, amount, podsBalancesBeforeWallet1 };
         };
 
         async function initWrongPodAndMint () {
@@ -256,6 +245,44 @@ function shouldBehaveLikeERC20Pods (initContracts) {
             });
         });
 
+        it('should not add more pods than limit', async function () {
+            const { erc20Pods, pods } = await loadFixture(initContracts);
+            const podsLimit = await erc20Pods.podsLimit();
+            for (let i = 0; i < podsLimit; i++) {
+                await erc20Pods.addPod(pods[i].address);
+            }
+            await expect(erc20Pods.addPod(constants.EEE_ADDRESS))
+                .to.be.revertedWithCustomError(erc20Pods, 'PodsLimitReachedForAccount');
+        });
+    });
+};
+
+function shouldBehaveLikeERC20PodsTransfers (initContracts) {
+    // Behavior test scenarios
+    describe('transfers should behave like ERC20 Pods transfers', function () {
+        let wallet1, wallet2, wallet3;
+
+        before(async function () {
+            [wallet1, wallet2, wallet3] = await ethers.getSigners();
+        });
+
+        async function initAndMint () {
+            const { erc20Pods, pods, amount } = await initContracts();
+            await erc20Pods.mint(wallet1.address, amount);
+            return { erc20Pods, pods, amount };
+        }
+
+        async function initAndMintAndAddPods () {
+            const { erc20Pods, pods, amount } = await initAndMint();
+            const podsBalancesBeforeWallet1 = [];
+            for (let i = 0; i < pods.length; i++) {
+                await erc20Pods.connect(wallet1).addPod(pods[i].address);
+                await pods[i].mint(wallet1.address, ether(i.toString()));
+                podsBalancesBeforeWallet1[i] = await pods[i].balanceOf(wallet1.address);
+            }
+            return { erc20Pods, pods, amount, podsBalancesBeforeWallet1 };
+        };
+
         describe('_afterTokenTransfer', function () {
             it('should not affect when amount is zero', async function () {
                 const { erc20Pods, pods, podsBalancesBeforeWallet1 } = await loadFixture(initAndMintAndAddPods);
@@ -357,19 +384,10 @@ function shouldBehaveLikeERC20Pods (initContracts) {
                 expect(await erc20Pods.balanceOf(wallet3.address)).to.be.equals(wallet3beforeBalance.add(amount));
             });
         });
-
-        it('should not add more pods than limit', async function () {
-            const { erc20Pods, pods } = await loadFixture(initContracts);
-            const podsLimit = await erc20Pods.podsLimit();
-            for (let i = 0; i < podsLimit; i++) {
-                await erc20Pods.addPod(pods[i].address);
-            }
-            await expect(erc20Pods.addPod(constants.EEE_ADDRESS))
-                .to.be.revertedWithCustomError(erc20Pods, 'PodsLimitReachedForAccount');
-        });
     });
 };
 
 module.exports = {
     shouldBehaveLikeERC20Pods,
+    shouldBehaveLikeERC20PodsTransfers,
 };
