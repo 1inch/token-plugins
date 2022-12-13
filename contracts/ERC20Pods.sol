@@ -20,6 +20,9 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     error PodsLimitReachedForAccount();
     error InsufficientGas();
 
+    event PodAdded(address indexed account, address indexed pod);
+    event PodRemoved(address indexed account, address indexed pod);
+
     uint256 public immutable podsLimit;
     uint256 public immutable podCallGasLimit;
 
@@ -76,6 +79,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
         if (!_pods[account].add(pod)) revert PodAlreadyAdded();
         if (_pods[account].length() > podsLimit) revert PodsLimitReachedForAccount();
 
+        emit PodAdded(account, pod);
         uint256 balance = balanceOf(account);
         if (balance > 0) {
             _updateBalances(pod, address(0), account, balance);
@@ -85,6 +89,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     function _removePod(address account, address pod) internal virtual {
         if (!_pods[account].remove(pod)) revert PodNotFound();
 
+        emit PodRemoved(account, pod);
         uint256 balance = balanceOf(account);
         if (balance > 0) {
             _updateBalances(pod, account, address(0), balance);
@@ -96,6 +101,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
         uint256 balance = balanceOf(account);
         unchecked {
             for (uint256 i = items.length; i > 0; i--) {
+                emit PodRemoved(account, items[i - 1]);
                 if (balance > 0) {
                     _updateBalances(items[i - 1], account, address(0), balance);
                 }
