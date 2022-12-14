@@ -19,6 +19,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     error InvalidPodAddress();
     error PodsLimitReachedForAccount();
     error InsufficientGas();
+    error ZeroPodsLimit();
 
     uint256 public immutable podsLimit;
     uint256 public immutable podCallGasLimit;
@@ -27,6 +28,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     mapping(address => AddressSet.Data) private _pods;
 
     constructor(uint256 podsLimit_, uint256 podCallGasLimit_) {
+        if (podsLimit_ == 0) revert ZeroPodsLimit();
         podsLimit = podsLimit_;
         podCallGasLimit = podCallGasLimit_;
         _guard.init();
