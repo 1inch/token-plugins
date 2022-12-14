@@ -20,9 +20,6 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     error PodsLimitReachedForAccount();
     error InsufficientGas();
 
-    event PodAdded(address indexed account, address indexed pod);
-    event PodRemoved(address indexed account, address indexed pod);
-
     uint256 public immutable podsLimit;
     uint256 public immutable podCallGasLimit;
 
