@@ -98,11 +98,11 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
         uint256 balance = balanceOf(account);
         unchecked {
             for (uint256 i = items.length; i > 0; i--) {
+                _pods[account].remove(items[i - 1]);
                 emit PodRemoved(account, items[i - 1]);
                 if (balance > 0) {
                     _updateBalances(items[i - 1], account, address(0), balance);
                 }
-                _pods[account].remove(items[i - 1]);
             }
         }
     }
