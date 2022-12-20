@@ -1,6 +1,6 @@
 {
   "name": "@1inch/erc20-pods",
-  "version": "0.0.9",
+  "version": "0.0.14",
   "description": "ERC20 extension enabling external smart contract based Pods to track balances of those users who opted-in to these Pods",
   "repository": {
     "type": "git",
@@ -50,9 +50,7 @@
     "test:ci": "hardhat test"
   },
   "files": [
-    "contracts/*.sol",
-    "contracts/interfaces/*.sol",
-    "contracts/mocks/*.sol",
+    "contracts",
     "test/behaviors/*.js"
   ]
 }
