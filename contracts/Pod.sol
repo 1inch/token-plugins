@@ -25,11 +25,11 @@ abstract contract Pod is IPod {
         tokenId = tokenId_;
     }
 
-    function updateBalancesWithTokenId(address from, address to, uint256 amount, uint256 id) external onlyToken onlyTokenId(id) {
+    function updateBalances(address from, address to, uint256 amount) external onlyToken {
         _updateBalances(from, to, amount);
     }
 
-    function updateBalances(address from, address to, uint256 amount) external onlyToken {
+    function updateBalancesWithTokenId(address from, address to, uint256 amount, uint256 id) external onlyToken onlyTokenId(id) {
         _updateBalances(from, to, amount);
     }
 

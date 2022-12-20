@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
 
 import "./interfaces/IPod.sol";
+import "./interfaces/IPodWithId.sol";
 
 library TokenPodsLib {
     using AddressSet for AddressSet.Data;
@@ -31,7 +32,7 @@ library TokenPodsLib {
 
     function makeInfo(Data storage data, uint256 podCallGasLimit_) internal pure returns(Info memory info) {
         DataPtr ptr;
-        assembly {
+        assembly {  // solhint-disable-line no-inline-assembly
             ptr := data.slot
         }
         info.data = ptr;
@@ -155,10 +156,7 @@ library TokenPodsLib {
     // moreover call to a destructed pod would also revert even inside try-catch block in Solidity 0.8.17
     /// @dev try IPod(pod).updateBalances{gas: _POD_CALL_GAS_LIMIT}(from, to, amount) {} catch {}
     function _notifyPod(address pod, address from, address to, uint256 amount, uint256 id, bool hasId, uint256 gasLimit) private {
-        bytes4 selector = IPod.updateBalances.selector;
-        if (hasId) {
-            selector = IPod.updateBalancesWithTokenId.selector;
-        }
+        bytes4 selector = hasId ? IPodWithId.updateBalancesWithTokenId.selector : IPod.updateBalances.selector;
         bytes4 exception = InsufficientGas.selector;
         assembly {  // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
@@ -180,7 +178,7 @@ library TokenPodsLib {
 
     function _getData(Info memory info) private pure returns(Data storage data) {
         DataPtr ptr = info.data;
-        assembly {
+        assembly {  // solhint-disable-line no-inline-assembly
             data.slot := ptr
         }
     }
