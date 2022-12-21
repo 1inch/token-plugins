@@ -14,7 +14,7 @@ contract WrongPodMock is ERC20, Pod {
 
     constructor(string memory name, string memory symbol, IERC20Pods token_) ERC20(name, symbol) Pod(token_) {} // solhint-disable-line no-empty-blocks
 
-    function updateBalances(address /*from*/, address /*to*/, uint256 /*amount*/) external view {
+    function _updateBalances(address /*from*/, address /*to*/, uint256 /*amount*/) internal view override {
         if (isRevert) revert PodsUpdateBalanceRevert();
         if (isOutOfGas) assert(false);
         if (isReturnGasBomb) { assembly { return(0, 1000000) } } // solhint-disable-line no-inline-assembly

@@ -229,10 +229,8 @@ function shouldBehaveLikeERC20Pods (initContracts) {
 
         describe('_updateBalances', function () {
             it('should not fail when updateBalance in pod reverts', async function () {
-                const { erc20Pods, wrongPod, amount } = await loadFixture(initWrongPodAndMint);
+                const { erc20Pods, wrongPod } = await loadFixture(initWrongPodAndMint);
                 await wrongPod.setIsRevert(true);
-                await expect(wrongPod.updateBalances(wallet1.address, wallet2.address, amount))
-                    .to.be.revertedWithCustomError(wrongPod, 'PodsUpdateBalanceRevert');
                 await erc20Pods.addPod(wrongPod.address);
                 expect(await erc20Pods.pods(wallet1.address)).to.have.deep.equals([wrongPod.address]);
             });

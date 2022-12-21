@@ -18,4 +18,10 @@ abstract contract Pod is IPod {
     constructor(IERC20Pods token_) {
         token = token_;
     }
+
+    function updateBalances(address from, address to, uint256 amount) external onlyToken {
+        _updateBalances(from, to, amount);
+    }
+
+    function _updateBalances(address from, address to, uint256 amount) internal virtual;
 }
