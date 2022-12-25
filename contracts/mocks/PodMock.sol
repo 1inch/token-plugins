@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../Pod.sol";
 
 contract PodMock is ERC20, Pod {
-    constructor(string memory name, string memory symbol, address token_)
+    constructor(string memory name, string memory symbol, IERC20Pods token_)
         ERC20(name, symbol)
         Pod(token_, 0)
     {} // solhint-disable-line no-empty-blocks

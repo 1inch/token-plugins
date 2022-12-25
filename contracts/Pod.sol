@@ -3,15 +3,16 @@
 pragma solidity ^0.8.0;
 
 import "./interfaces/IPod.sol";
+import "./interfaces/IERC20Pods.sol";
 
 abstract contract Pod is IPod {
     error AccessDenied();
 
-    address public immutable token;
+    IERC20Pods public immutable token;
     uint256 public immutable tokenId;
 
     modifier onlyToken {
-        if (msg.sender != token) revert AccessDenied();
+        if (msg.sender != address(token)) revert AccessDenied();
         _;
     }
 
@@ -20,7 +21,7 @@ abstract contract Pod is IPod {
         _;
     }
 
-    constructor(address token_, uint256 tokenId_) {
+    constructor(IERC20Pods token_, uint256 tokenId_) {
         token = token_;
         tokenId = tokenId_;
     }

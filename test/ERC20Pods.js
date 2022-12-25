@@ -4,6 +4,7 @@ const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
 const { shouldBehaveLikeERC20Pods, shouldBehaveLikeERC20PodsTransfers } = require('./behaviors/ERC20Pods.behavior');
 
 const POD_LIMITS = 10;
+const POD_GAS_LIMIT = 200_000;
 
 describe('ERC20Pods', function () {
     let wallet1;
@@ -14,7 +15,7 @@ describe('ERC20Pods', function () {
 
     async function initContracts () {
         const ERC20PodsMock = await ethers.getContractFactory('ERC20PodsMock');
-        const erc20Pods = await ERC20PodsMock.deploy('ERC20PodsMock', 'EPM', POD_LIMITS);
+        const erc20Pods = await ERC20PodsMock.deploy('ERC20PodsMock', 'EPM', POD_LIMITS, POD_GAS_LIMIT);
         await erc20Pods.deployed();
 
         const pods = [];
