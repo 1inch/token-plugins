@@ -3,9 +3,10 @@
 pragma solidity ^0.8.0;
 
 import "./interfaces/IPod.sol";
+import "./interfaces/IPodWithId.sol";
 import "./interfaces/IERC20Pods.sol";
 
-abstract contract Pod is IPod {
+abstract contract Pod is IPod, IPodWithId {
     error AccessDenied();
 
     IERC20Pods public immutable token;

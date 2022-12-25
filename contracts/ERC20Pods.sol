@@ -10,7 +10,7 @@ import "./TokenPodsLib.sol";
 import "./libs/ReentrancyGuard.sol";
 
 abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
-    using TokenPodsLib for TokenPodsLib.Info;
+    using TokenPodsLib for TokenPodsLib.Data;
     using ReentrancyGuardLib for ReentrancyGuardLib.Data;
 
     error ZeroPodsLimit();
@@ -30,19 +30,19 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     }
 
     function hasPod(address account, address pod) public view virtual returns(bool) {
-        return _info().hasPod(account, pod);
+        return _pods.hasPod(account, pod);
     }
 
     function podsCount(address account) public view virtual returns(uint256) {
-        return _info().podsCount(account);
+        return _pods.podsCount(account);
     }
 
     function podAt(address account, uint256 index) public view virtual returns(address) {
-        return _info().podAt(account, index);
+        return _pods.podAt(account, index);
     }
 
     function pods(address account) public view virtual returns(address[] memory) {
-        return _info().pods(account);
+        return _pods.pods(account);
     }
 
     function balanceOf(address account) public nonReentrantView(_guard) view override(IERC20, ERC20) virtual returns(uint256) {
@@ -50,29 +50,25 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     }
 
     function podBalanceOf(address pod, address account) public nonReentrantView(_guard) view virtual returns(uint256) {
-        return _info().podBalanceOf(account, pod, super.balanceOf(account));
+        return _pods.podBalanceOf(account, pod, super.balanceOf(account));
     }
 
     function addPod(address pod) public virtual {
-        if (_info().addPod(msg.sender, pod, balanceOf(msg.sender)) > podsLimit) revert PodsLimitReachedForAccount();
+        if (_pods.addPod(msg.sender, pod, balanceOf(msg.sender), podCallGasLimit) > podsLimit) revert PodsLimitReachedForAccount();
     }
 
     function removePod(address pod) public virtual {
-        _info().removePod(msg.sender, pod, balanceOf(msg.sender));
+        _pods.removePod(msg.sender, pod, balanceOf(msg.sender), podCallGasLimit);
     }
 
     function removeAllPods() public virtual {
-        _info().removeAllPods(msg.sender, balanceOf(msg.sender));
-    }
-
-    function _info() private view returns(TokenPodsLib.Info memory) {
-        return TokenPodsLib.makeInfo(_pods, podCallGasLimit);
+        _pods.removeAllPods(msg.sender, balanceOf(msg.sender), podCallGasLimit);
     }
 
     // ERC20 Overrides
 
     function _afterTokenTransfer(address from, address to, uint256 amount) internal nonReentrant(_guard) override virtual {
         super._afterTokenTransfer(from, to, amount);
-        _info().updateBalances(from, to, amount);
+        _pods.updateBalances(from, to, amount, podCallGasLimit);
     }
 }
