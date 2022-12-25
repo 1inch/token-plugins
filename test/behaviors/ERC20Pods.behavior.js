@@ -151,7 +151,7 @@ function shouldBehaveLikeERC20Pods (initContracts) {
                 expect(await erc20Pods.hasPod(wallet1.address, pods[1].address)).to.be.equals(false);
                 await erc20Pods.addPod(pods[0].address);
                 await erc20Pods.addPod(pods[1].address);
-                expect(await erc20Pods.pods(wallet1.address)).to.have.deep.equals([pods[0].address, pods[1].address]);
+                expect(await erc20Pods.pods(wallet1.address)).to.be.deep.equals([pods[0].address, pods[1].address]);
             });
 
             it('should updateBalance via pod only for wallets with non-zero balance', async function () {
@@ -232,14 +232,14 @@ function shouldBehaveLikeERC20Pods (initContracts) {
                 const { erc20Pods, wrongPod } = await loadFixture(initWrongPodAndMint);
                 await wrongPod.setIsRevert(true);
                 await erc20Pods.addPod(wrongPod.address);
-                expect(await erc20Pods.pods(wallet1.address)).to.have.deep.equals([wrongPod.address]);
+                expect(await erc20Pods.pods(wallet1.address)).to.be.deep.equals([wrongPod.address]);
             });
 
             it('should not fail when updateBalance in pod has OutOfGas', async function () {
                 const { erc20Pods, wrongPod } = await loadFixture(initWrongPodAndMint);
                 await wrongPod.setOutOfGas(true);
                 await erc20Pods.addPod(wrongPod.address);
-                expect(await erc20Pods.pods(wallet1.address)).to.have.deep.equals([wrongPod.address]);
+                expect(await erc20Pods.pods(wallet1.address)).to.be.deep.equals([wrongPod.address]);
             });
         });
 

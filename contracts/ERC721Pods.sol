@@ -1,15 +1,16 @@
+
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
 
-import "./interfaces/IERC20Pods.sol";
+import "./interfaces/IERC721Pods.sol";
 import "./TokenPodsLib.sol";
 import "./libs/ReentrancyGuard.sol";
 
-abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
+abstract contract ERC721Pods is ERC721, IERC721Pods, ReentrancyGuardExt {
     using TokenPodsLib for TokenPodsLib.Data;
     using ReentrancyGuardLib for ReentrancyGuardLib.Data;
 
@@ -45,7 +46,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
         return _pods.pods(account);
     }
 
-    function balanceOf(address account) public nonReentrantView(_guard) view override(IERC20, ERC20) virtual returns(uint256) {
+    function balanceOf(address account) public nonReentrantView(_guard) view override(IERC721, ERC721) virtual returns(uint256) {
         return super.balanceOf(account);
     }
 
@@ -65,10 +66,10 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
         _pods.removeAllPods(msg.sender, balanceOf(msg.sender), podCallGasLimit);
     }
 
-    // ERC20 Overrides
+    // ERC721 Overrides
 
-    function _afterTokenTransfer(address from, address to, uint256 amount) internal nonReentrant(_guard) override virtual {
-        super._afterTokenTransfer(from, to, amount);
-        _pods.updateBalances(from, to, amount, podCallGasLimit);
+    function _afterTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize) internal nonReentrant(_guard) override virtual {
+        super._afterTokenTransfer(from, to, firstTokenId, batchSize);
+        _pods.updateBalances(from, to, batchSize, podCallGasLimit);
     }
 }
