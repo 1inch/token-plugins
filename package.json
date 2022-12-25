@@ -4,12 +4,12 @@
   "description": "ERC20 extension enabling external smart contract based Pods to track balances of those users who opted-in to these Pods",
   "repository": {
     "type": "git",
-    "url": "git@github.com:1inch/erc20-pods.git"
+    "url": "git@github.com:1inch/token-pods.git"
   },
   "bugs": {
-    "url": "https://github.com/1inch/erc20-pods/issues"
+    "url": "https://github.com/1inch/token-pods/issues"
   },
-  "homepage": "https://github.com/1inch/erc20-pods#readme",
+  "homepage": "https://github.com/1inch/token-pods#readme",
   "author": "1inch",
   "license": "MIT",
   "dependencies": {
