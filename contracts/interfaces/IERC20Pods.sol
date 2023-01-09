@@ -8,6 +8,8 @@ interface IERC20Pods is IERC20 {
     event PodAdded(address account, address pod);
     event PodRemoved(address account, address pod);
 
+    function podsLimit() external view returns(uint256);
+    function podCallGasLimit() external view returns(uint256);
     function hasPod(address account, address pod) external view returns(bool);
     function podsCount(address account) external view returns(uint256);
     function podAt(address account, uint256 index) external view returns(address);
