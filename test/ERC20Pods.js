@@ -18,14 +18,16 @@ describe('ERC20Pods', function () {
         const erc20Pods = await ERC20PodsMock.deploy('ERC20PodsMock', 'EPM', POD_LIMITS, POD_GAS_LIMIT);
         await erc20Pods.deployed();
 
+        const PodMock = await ethers.getContractFactory('PodMock');
         const pods = [];
         for (let i = 0; i < POD_LIMITS; i++) {
-            const PodMock = await ethers.getContractFactory('PodMock');
             pods[i] = await PodMock.deploy(`POD_TOKEN_${i}`, `PT${i}`, erc20Pods.address);
             await pods[i].deployed();
         }
+        const extraPod = await PodMock.deploy('EXTRA_POD_TOKEN', 'EPT', erc20Pods.address);
+        await extraPod.deployed();
         const amount = ether('1');
-        return { erc20Pods, pods, amount };
+        return { erc20Pods, pods, amount, extraPod };
     };
 
     async function initWrongPodAndMint () {
@@ -46,7 +48,7 @@ describe('ERC20Pods', function () {
         await wrongPod.setReturnGasBomb(true);
         const tx = await erc20Pods.addPod(wrongPod.address);
         const receipt = await tx.wait();
-        expect(receipt.gasUsed).to.be.lt(275761);
+        expect(receipt.gasUsed).to.be.lt(276265);
         expect(await erc20Pods.pods(wallet1.address)).to.have.deep.equals([wrongPod.address]);
     });
 });

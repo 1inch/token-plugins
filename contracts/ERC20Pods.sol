@@ -17,6 +17,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     error PodAlreadyAdded();
     error PodNotFound();
     error InvalidPodAddress();
+    error InvalidTokenInPod();
     error PodsLimitReachedForAccount();
     error InsufficientGas();
     error ZeroPodsLimit();
@@ -75,6 +76,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
 
     function _addPod(address account, address pod) internal virtual {
         if (pod == address(0)) revert InvalidPodAddress();
+        if (IPod(pod).token() != IERC20Pods(address(this))) revert InvalidTokenInPod();
         if (!_pods[account].add(pod)) revert PodAlreadyAdded();
         if (_pods[account].length() > podsLimit) revert PodsLimitReachedForAccount();
 

@@ -129,9 +129,9 @@ function shouldBehaveLikeERC20Pods (initContracts) {
             });
 
             it('should not add pod twice from one wallet', async function () {
-                const { erc20Pods } = await loadFixture(initContracts);
-                await erc20Pods.addPod(constants.EEE_ADDRESS);
-                await expect(erc20Pods.addPod(constants.EEE_ADDRESS))
+                const { erc20Pods, pods } = await loadFixture(initContracts);
+                await erc20Pods.addPod(pods[0].address);
+                await expect(erc20Pods.addPod(pods[0].address))
                     .to.be.revertedWithCustomError(erc20Pods, 'PodAlreadyAdded');
             });
 
@@ -244,12 +244,12 @@ function shouldBehaveLikeERC20Pods (initContracts) {
         });
 
         it('should not add more pods than limit', async function () {
-            const { erc20Pods, pods } = await loadFixture(initContracts);
+            const { erc20Pods, pods, extraPod } = await loadFixture(initContracts);
             const podsLimit = await erc20Pods.podsLimit();
             for (let i = 0; i < podsLimit; i++) {
                 await erc20Pods.addPod(pods[i].address);
             }
-            await expect(erc20Pods.addPod(constants.EEE_ADDRESS))
+            await expect(erc20Pods.addPod(extraPod.address))
                 .to.be.revertedWithCustomError(erc20Pods, 'PodsLimitReachedForAccount');
         });
     });
