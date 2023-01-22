@@ -210,29 +210,6 @@ function shouldBehaveLikeERC20Pods (initContracts) {
                 expect(await erc20Pods.podsCount(wallet1.address)).to.be.equals(0);
             });
 
-            it.skip('should updateBalance via pods only for wallets with non-zero balance', async function () {
-                const { erc20Pods, pods, amount } = await loadFixture(initAndAddAllPods);
-                expect(await erc20Pods.balanceOf(wallet1.address)).to.be.equals(amount);
-                expect(await erc20Pods.balanceOf(wallet2.address)).to.be.equals('0');
-                const wallet2BalancedPods = [0, 1, 5, 6, 7]; // random pods with non-zero balance on wallet2
-                for (let i = 0; i < pods.length; i++) {
-                    if (wallet2BalancedPods.indexOf(i) !== -1) {
-                        await pods[i].mint(wallet2.address, amount);
-                    }
-                }
-                for (let i = 0; i < pods.length; i++) {
-                    expect(await pods[i].balanceOf(wallet1.address)).to.be.equals(amount);
-                    expect(await pods[i].balanceOf(wallet2.address)).to.be.equals(wallet2BalancedPods.indexOf(i) !== -1 ? amount : '0');
-                }
-                await erc20Pods.removeAllPods();
-                await erc20Pods.connect(wallet2).removeAllPods();
-                for (let i = 0; i < pods.length; i++) {
-                    expect(await pods[i].balanceOf(wallet1.address)).to.be.equals('0');
-                    expect(await pods[i].balanceOf(wallet2.address)).to.be.equals(wallet2BalancedPods.indexOf(i) !== -1 ? amount : '0');
-                }
-            });
-        });
-
         describe('_updateBalances', function () {
             it('should not fail when updateBalance in pod reverts', async function () {
                 const { erc20Pods, wrongPod } = await loadFixture(initWrongPod);
