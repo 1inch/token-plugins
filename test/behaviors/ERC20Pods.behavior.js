@@ -366,46 +366,43 @@ function shouldBehaveLikeERC20PodsTransfers (initContracts) {
                 expect(await erc20Pods.balanceOf(wallet3.address)).to.be.equals(wallet3beforeBalance.add(amount));
             });
 
-            it.skip('should affect recipient and sender with different pods', async function () {
-                const { erc20Pods, pods, amount } = await loadFixture(initAndAddPods);
-                await erc20Pods.mint(wallet2.address, amount);
+            it('should affect recipient and sender with different pods', async function () {
+                const { erc20Pods, pods, amount } = await loadFixture(initAndCreatePods);
 
+                const podsBalancesBeforeWallet1 = [];
                 const podsBalancesBeforeWallet2 = [];
-                const podsBalancesBeforeWallet3 = [];
                 for (let i = 0; i < pods.length; i++) {
                     if (i <= pods.length / 2 + 2) {
-                        await erc20Pods.connect(wallet2).addPod(pods[i].address);
-                        await pods[i].mint(wallet2.address, ether((i + 1).toString()));
+                        await erc20Pods.connect(wallet1).addPod(pods[i].address);
                     }
                     if (i >= pods.length / 2 - 2) {
-                        await erc20Pods.connect(wallet3).addPod(pods[i].address);
-                        await pods[i].mint(wallet3.address, ether((i + 1).toString()));
+                        await erc20Pods.connect(wallet2).addPod(pods[i].address);
                     }
+                    podsBalancesBeforeWallet1[i] = await pods[i].balanceOf(wallet1.address);
                     podsBalancesBeforeWallet2[i] = await pods[i].balanceOf(wallet2.address);
-                    podsBalancesBeforeWallet3[i] = await pods[i].balanceOf(wallet3.address);
                 }
 
+                const wallet1beforeBalance = await erc20Pods.balanceOf(wallet1.address);
                 const wallet2beforeBalance = await erc20Pods.balanceOf(wallet2.address);
-                const wallet3beforeBalance = await erc20Pods.balanceOf(wallet3.address);
 
-                await erc20Pods.connect(wallet2).transfer(wallet3.address, amount);
+                await erc20Pods.connect(wallet1).transfer(wallet2.address, amount);
 
                 for (let i = 0; i < pods.length; i++) {
-                    expect(await pods[i].balanceOf(wallet2.address))
+                    expect(await pods[i].balanceOf(wallet1.address))
                         .to.be.equals(
                             i <= pods.length / 2 + 2
-                                ? podsBalancesBeforeWallet2[i].sub(amount)
+                                ? podsBalancesBeforeWallet1[i].sub(amount)
                                 : '0',
                         );
-                    expect(await pods[i].balanceOf(wallet3.address))
+                    expect(await pods[i].balanceOf(wallet2.address))
                         .to.be.equals(
                             i >= pods.length / 2 - 2
-                                ? podsBalancesBeforeWallet3[i].add(amount)
+                                ? podsBalancesBeforeWallet2[i].add(amount)
                                 : '0',
                         );
                 }
-                expect(await erc20Pods.balanceOf(wallet2.address)).to.be.equals(wallet2beforeBalance.sub(amount));
-                expect(await erc20Pods.balanceOf(wallet3.address)).to.be.equals(wallet3beforeBalance.add(amount));
+                expect(await erc20Pods.balanceOf(wallet1.address)).to.be.equals(wallet1beforeBalance.sub(amount));
+                expect(await erc20Pods.balanceOf(wallet2.address)).to.be.equals(wallet2beforeBalance.add(amount));
             });
         });
     });
