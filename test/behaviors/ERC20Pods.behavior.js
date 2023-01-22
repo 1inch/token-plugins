@@ -1,4 +1,4 @@
-const { expect, ether, constants } = require('@1inch/solidity-utils');
+const { expect, constants } = require('@1inch/solidity-utils');
 const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
 const { ethers } = require('hardhat');
 
@@ -209,6 +209,7 @@ function shouldBehaveLikeERC20Pods (initContracts) {
                 await erc20Pods.removeAllPods();
                 expect(await erc20Pods.podsCount(wallet1.address)).to.be.equals(0);
             });
+        });
 
         describe('_updateBalances', function () {
             it('should not fail when updateBalance in pod reverts', async function () {
