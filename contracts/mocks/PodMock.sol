@@ -17,8 +17,4 @@ contract PodMock is ERC20, Pod {
             _transfer(from, to, amount);
         }
     }
-
-    function mint(address to, uint256 amount) external {
-        _mint(to, amount);
-    }
 }

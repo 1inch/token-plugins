@@ -18,21 +18,13 @@ describe('ERC20Pods', function () {
         const erc20Pods = await ERC20PodsMock.deploy('ERC20PodsMock', 'EPM', POD_LIMITS, POD_GAS_LIMIT);
         await erc20Pods.deployed();
 
-        const PodMock = await ethers.getContractFactory('PodMock');
-        const pods = [];
-        for (let i = 0; i < POD_LIMITS; i++) {
-            pods[i] = await PodMock.deploy(`POD_TOKEN_${i}`, `PT${i}`, erc20Pods.address);
-            await pods[i].deployed();
-        }
-        const extraPod = await PodMock.deploy('EXTRA_POD_TOKEN', 'EPT', erc20Pods.address);
-        await extraPod.deployed();
         const amount = ether('1');
-        return { erc20Pods, pods, amount, extraPod };
+        await erc20Pods.mint(wallet1.address, amount);
+        return { erc20Pods, POD_LIMITS, amount };
     };
 
-    async function initWrongPodAndMint () {
+    async function initWrongPod () {
         const { erc20Pods, amount } = await initContracts();
-        await erc20Pods.mint(wallet1.address, amount);
         const WrongPodMock = await ethers.getContractFactory('WrongPodMock');
         const wrongPod = await WrongPodMock.deploy('WrongPodMock', 'WPM', erc20Pods.address);
         await wrongPod.deployed();
@@ -44,7 +36,7 @@ describe('ERC20Pods', function () {
     shouldBehaveLikeERC20PodsTransfers(initContracts);
 
     it('should not fail when updateBalance returns gas bomb @skip-on-coverage', async function () {
-        const { erc20Pods, wrongPod } = await loadFixture(initWrongPodAndMint);
+        const { erc20Pods, wrongPod } = await loadFixture(initWrongPod);
         await wrongPod.setReturnGasBomb(true);
         const tx = await erc20Pods.addPod(wrongPod.address);
         const receipt = await tx.wait();
