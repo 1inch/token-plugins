@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-import "./interfaces/IPod.sol";
-import "./interfaces/IERC20Pods.sol";
+import { IPod } from "./interfaces/IPod.sol";
+import { IERC20Pods } from "./interfaces/IERC20Pods.sol";
 
 abstract contract Pod is IPod {
     error AccessDenied();

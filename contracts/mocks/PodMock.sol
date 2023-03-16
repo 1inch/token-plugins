@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../Pod.sol";
+import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import { IERC20Pods, Pod } from "../Pod.sol";
 
 contract PodMock is ERC20, Pod {
     constructor(string memory name, string memory symbol, IERC20Pods token_) ERC20(name, symbol) Pod(token_) {} // solhint-disable-line no-empty-blocks
