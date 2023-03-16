@@ -118,8 +118,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
         bytes4 selector = IPod.updateBalances.selector;
         bytes4 exception = InsufficientGas.selector;
         uint256 gasLimit = podCallGasLimit;
-        /// @solidity memory-safe-assembly
-        assembly {  // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
             mstore(ptr, selector)
             mstore(add(ptr, 0x04), from)

@@ -17,7 +17,7 @@ contract WrongPodMock is ERC20, Pod {
     function _updateBalances(address /*from*/, address /*to*/, uint256 /*amount*/) internal view override {
         if (isRevert) revert PodsUpdateBalanceRevert();
         if (isOutOfGas) assert(false);
-        if (isReturnGasBomb) { assembly { return(0, 1000000) } } // solhint-disable-line no-inline-assembly
+        if (isReturnGasBomb) { assembly ("memory-safe") { return(0, 1000000) } } // solhint-disable-line no-inline-assembly
     }
 
     function setIsRevert(bool isRevert_) external {
