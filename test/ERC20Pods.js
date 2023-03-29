@@ -1,6 +1,6 @@
 const { expect, ether } = require('@1inch/solidity-utils');
-const { ethers } = require('hardhat');
 const hre = require('hardhat');
+const { ethers } = hre;
 const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
 const { shouldBehaveLikeERC20Pods, shouldBehaveLikeERC20PodsTransfers } = require('./behaviors/ERC20Pods.behavior');
 
