@@ -9,6 +9,11 @@ import "./interfaces/IERC20Pods.sol";
 import "./interfaces/IPod.sol";
 import "./libs/ReentrancyGuard.sol";
 
+/**
+ * @title ERC20Pods
+ * @dev A base implementation of token contract to hold and manage pods of an ERC20 token with a limited number of pods per account.
+ * Each pod is a contract that implements IPod interface (and/or derived from Pod).
+ */
 abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     using AddressSet for AddressSet.Data;
     using AddressArray for AddressArray.Data;
@@ -22,12 +27,19 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     error InsufficientGas();
     error ZeroPodsLimit();
 
+    /// @dev Limit of pods per account
     uint256 public immutable podsLimit;
+    /// @dev Gas limit for a single pod call
     uint256 public immutable podCallGasLimit;
 
     ReentrancyGuardLib.Data private _guard;
     mapping(address => AddressSet.Data) private _pods;
 
+    /**
+     * @dev Constructor that sets the limit of pods per account and the gas limit for a pod call.
+     * @param podsLimit_ The limit of pods per account.
+     * @param podCallGasLimit_ The gas limit for a pod call. Intended to prevent gas bomb attacks
+     */
     constructor(uint256 podsLimit_, uint256 podCallGasLimit_) {
         if (podsLimit_ == 0) revert ZeroPodsLimit();
         podsLimit = podsLimit_;
@@ -35,26 +47,60 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
         _guard.init();
     }
 
+    /**
+     * @dev Returns whether an account has a specific pod.
+     * @param account The address of the account.
+     * @param pod The address of the pod.
+     * @return bool A boolean indicating whether the account has the specified pod.
+     */
     function hasPod(address account, address pod) public view virtual returns(bool) {
         return _pods[account].contains(pod);
     }
 
+    /**
+     * @dev Returns the number of Pods registered for an account.
+     * @param account The address of the account.
+     * @return uint256 A number of pods registered for the account.
+     */
     function podsCount(address account) public view virtual returns(uint256) {
         return _pods[account].length();
     }
 
+    /**
+     * @dev Returns the address of a pod at a specified index for a given account .
+     * @param account The address of the account.
+     * @param index The index of the pod to retrieve.
+     * @return pod The address of the pod.
+     */
     function podAt(address account, uint256 index) public view virtual returns(address) {
         return _pods[account].at(index);
     }
 
+    /**
+     * @dev Returns an array of all pods owned by a given account.
+     * @param account The address of the account to query.
+     * @return pods An array of pod addresses.
+     */
     function pods(address account) public view virtual returns(address[] memory) {
         return _pods[account].items.get();
     }
 
+
+    /**
+     * @dev Returns the balance of a given account.
+     * @param account The address of the account.
+     * @return balance The account balance.
+     */
     function balanceOf(address account) public nonReentrantView(_guard) view override(IERC20, ERC20) virtual returns(uint256) {
         return super.balanceOf(account);
     }
 
+    /**
+     * @dev Returns the balance of a given account if a specified pod is added or zero.
+     * @param pod The address of the pod to query.
+     * @param account The address of the account to query.
+     * @return balance The account balance if the specified pod is added and zero otherwise. 
+     */
     function podBalanceOf(address pod, address account) public nonReentrantView(_guard) view virtual returns(uint256) {
         if (hasPod(account, pod)) {
             return super.balanceOf(account);
@@ -62,14 +108,25 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
         return 0;
     }
 
+    /**
+     * @dev Adds a new pod for the calling account.
+     * @param pod The address of the pod to add.
+     */
     function addPod(address pod) public virtual {
         _addPod(msg.sender, pod);
     }
 
+    /**
+     * @dev Removes a pod for the calling account.
+     * @param pod The address of the pod to remove.
+     */
     function removePod(address pod) public virtual {
         _removePod(msg.sender, pod);
     }
 
+    /**
+     * @dev Removes all pods for the calling account.
+     */
     function removeAllPods() public virtual {
         _removeAllPods(msg.sender);
     }
