@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
+import { IERC20, ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import { AddressSet, AddressArray } from "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
 
-import "./interfaces/IERC20Pods.sol";
-import "./interfaces/IPod.sol";
-import "./libs/ReentrancyGuard.sol";
+import { IERC20Pods } from "./interfaces/IERC20Pods.sol";
+import { IPod } from "./interfaces/IPod.sol";
+import { ReentrancyGuardExt, ReentrancyGuardLib } from "./libs/ReentrancyGuard.sol";
 
 /**
  * @title ERC20Pods
@@ -175,8 +175,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
         bytes4 selector = IPod.updateBalances.selector;
         bytes4 exception = InsufficientGas.selector;
         uint256 gasLimit = podCallGasLimit;
-        /// @solidity memory-safe-assembly
-        assembly {  // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
             mstore(ptr, selector)
             mstore(add(ptr, 0x04), from)

@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-import "./interfaces/IPod.sol";
-import "./interfaces/IERC20Pods.sol";
+import { IPod } from "./interfaces/IPod.sol";
+import { IERC20Pods } from "./interfaces/IERC20Pods.sol";
 
 
 /// @dev ERC20 extension enabling external smart contract based Pods to track balances of those users who opted-in to these Pods.
