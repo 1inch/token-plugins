@@ -182,11 +182,14 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
             mstore(add(ptr, 0x24), to)
             mstore(add(ptr, 0x44), amount)
 
-            if lt(div(mul(gas(), 63), 64), gasLimit) {
-                mstore(0, exception)
-                revert(0, 4)
+            let gasLeft := gas()
+            let success := call(gasLimit, pod, 0, ptr, 0x64, 0, 0)
+            if iszero(success) {
+                if lt(div(mul(gasLeft, 63), 64), gasLimit) {
+                    mstore(0, exception)
+                    revert(0, 4)
+                }
             }
-            pop(call(gasLimit, pod, 0, ptr, 0x64, 0, 0))
         }
     }
 
