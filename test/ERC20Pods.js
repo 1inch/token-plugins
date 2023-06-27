@@ -32,6 +32,14 @@ describe('ERC20Pods', function () {
         return { erc20Pods, wrongPod, amount };
     };
 
+    async function initGasLimitPodMock () {
+        const { erc20Pods, amount } = await initContracts();
+        const GasLimitPodMock = await ethers.getContractFactory('GasLimitPodMock');
+        const gasLimitPodMock = await GasLimitPodMock.deploy(100_000, erc20Pods.address);
+        await gasLimitPodMock.deployed();
+        return { erc20Pods, gasLimitPodMock, amount };
+    };
+
     shouldBehaveLikeERC20Pods(initContracts);
 
     shouldBehaveLikeERC20PodsTransfers(initContracts);
@@ -43,5 +51,20 @@ describe('ERC20Pods', function () {
         const receipt = await (await erc20Pods.addPod(wrongPod.address)).wait();
         expect(receipt.gasUsed).to.be.lt(POD_GAS_LIMIT * 2);
         expect(await erc20Pods.pods(wallet1.address)).to.have.deep.equals([wrongPod.address]);
+    });
+
+    it('should handle low-gas-related reverts in pods', async function () {
+        if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
+        const { erc20Pods, gasLimitPodMock } = await loadFixture(initGasLimitPodMock);
+
+        const estimateGas = await erc20Pods.estimateGas.addPod(gasLimitPodMock.address);
+        expect(estimateGas).to.be.lt(POD_GAS_LIMIT * 2);
+
+        const receipt = await (await erc20Pods.addPod(gasLimitPodMock.address, { gasLimit: estimateGas })).wait();
+        expect(receipt.gasUsed).to.be.lt(POD_GAS_LIMIT * 2);
+
+        expect(await erc20Pods.pods(wallet1.address)).to.have.deep.equals(
+            [gasLimitPodMock.address],
+        );
     });
 });
