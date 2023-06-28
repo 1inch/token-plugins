@@ -24,6 +24,14 @@ describe('ERC20Pods', function () {
         return { erc20Pods, POD_LIMITS, amount };
     };
 
+    async function initPod () {
+        const { erc20Pods, amount } = await initContracts();
+        const PodMock = await ethers.getContractFactory('PodMock');
+        const pod = await PodMock.deploy('PodMock', 'PM', erc20Pods.address);
+        await pod.deployed();
+        return { erc20Pods, pod, amount };
+    };
+
     async function initWrongPod () {
         const { erc20Pods, amount } = await initContracts();
         const WrongPodMock = await ethers.getContractFactory('WrongPodMock');
@@ -43,6 +51,17 @@ describe('ERC20Pods', function () {
     shouldBehaveLikeERC20Pods(initContracts);
 
     shouldBehaveLikeERC20PodsTransfers(initContracts);
+
+    it('should work with MockPod with small gas limit', async function () {
+        const { erc20Pods, pod } = await loadFixture(initPod);
+        const estimateGas = await erc20Pods.estimateGas.addPod(pod.address);
+        expect(estimateGas).to.be.lt(POD_GAS_LIMIT);
+
+        const receipt = await (await erc20Pods.addPod(pod.address, { gasLimit: estimateGas })).wait();
+        expect(receipt.gasUsed).to.be.lt(POD_GAS_LIMIT);
+
+        expect(await erc20Pods.pods(wallet1.address)).to.have.deep.equals([pod.address]);
+    });
 
     it('should not fail when updateBalance returns gas bomb', async function () {
         if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
@@ -66,5 +85,13 @@ describe('ERC20Pods', function () {
         expect(await erc20Pods.pods(wallet1.address)).to.have.deep.equals(
             [gasLimitPodMock.address],
         );
+    });
+
+    it('should fail with low-gas-related reverts in pods', async function () {
+        if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
+        const { erc20Pods, gasLimitPodMock } = await loadFixture(initGasLimitPodMock);
+
+        await expect(erc20Pods.addPod(gasLimitPodMock.address, { gasLimit: POD_GAS_LIMIT }))
+            .to.be.revertedWithCustomError(gasLimitPodMock, 'InsufficientGas');
     });
 });
