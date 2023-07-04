@@ -24,7 +24,6 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     error InvalidPodAddress();
     error InvalidTokenInPod();
     error PodsLimitReachedForAccount();
-    error InsufficientGas();
     error ZeroPodsLimit();
 
     /// @dev Limit of pods per account
@@ -99,7 +98,7 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
      * @dev Returns the balance of a given account if a specified pod is added or zero.
      * @param pod The address of the pod to query.
      * @param account The address of the account to query.
-     * @return balance The account balance if the specified pod is added and zero otherwise. 
+     * @return balance The account balance if the specified pod is added and zero otherwise.
      */
     function podBalanceOf(address pod, address account) public nonReentrantView(_guard) view virtual returns(uint256) {
         if (hasPod(account, pod)) {
@@ -173,7 +172,6 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
     /// @dev try IPod(pod).updateBalances{gas: _POD_CALL_GAS_LIMIT}(from, to, amount) {} catch {}
     function _updateBalances(address pod, address from, address to, uint256 amount) private {
         bytes4 selector = IPod.updateBalances.selector;
-        bytes4 exception = InsufficientGas.selector;
         uint256 gasLimit = podCallGasLimit;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
@@ -182,11 +180,13 @@ abstract contract ERC20Pods is ERC20, IERC20Pods, ReentrancyGuardExt {
             mstore(add(ptr, 0x24), to)
             mstore(add(ptr, 0x44), amount)
 
-            if lt(div(mul(gas(), 63), 64), gasLimit) {
-                mstore(0, exception)
-                revert(0, 4)
+            let gasLeft := gas()
+            if iszero(call(gasLimit, pod, 0, ptr, 0x64, 0, 0)) {
+                if lt(div(mul(gasLeft, 63), 64), gasLimit) {
+                    returndatacopy(ptr, 0, returndatasize())
+                    revert(ptr, returndatasize())
+                }
             }
-            pop(call(gasLimit, pod, 0, ptr, 0x64, 0, 0))
         }
     }
 
