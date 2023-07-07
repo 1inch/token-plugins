@@ -3,16 +3,16 @@
 pragma solidity ^0.8.0;
 
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import { IERC20Pods, Pod } from "../Pod.sol";
+import { IERC20Plugins, Plugin } from "../Plugin.sol";
 
-contract GasLimitPodMock is ERC20, Pod {
+contract GasLimitedPluginMock is ERC20, Plugin {
     error InsufficientGas();
 
     uint256 public immutable gasLimit;
 
-    constructor(uint256 gasLimit_, IERC20Pods token)
-        ERC20(type(GasLimitPodMock).name, "GLPM")
-        Pod(token)
+    constructor(uint256 gasLimit_, IERC20Plugins token)
+        ERC20(type(GasLimitedPluginMock).name, "GLPM")
+        Plugin(token)
     {
         gasLimit = gasLimit_;
     }

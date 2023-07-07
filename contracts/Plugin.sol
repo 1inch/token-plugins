@@ -2,16 +2,16 @@
 
 pragma solidity ^0.8.0;
 
-import { IPod } from "./interfaces/IPod.sol";
-import { IERC20Pods } from "./interfaces/IERC20Pods.sol";
+import { IPlugin } from "./interfaces/IPlugin.sol";
+import { IERC20Plugins } from "./interfaces/IERC20Plugins.sol";
 
 
-/// @dev ERC20 extension enabling external smart contract based Pods to track balances of those users who opted-in to these Pods.
+/// @dev ERC20 extension enabling external smart contract based plugins to track balances of those users who opted-in to these plugins.
 /// Could be useful for farming / DAO voting and every case where you need to track user's balances without moving tokens to another contract.
-abstract contract Pod is IPod {
+abstract contract Plugin is IPlugin {
     error AccessDenied();
 
-    IERC20Pods public immutable token;
+    IERC20Plugins public immutable token;
 
     /// @dev Throws an error if the caller is not the token contract
     modifier onlyToken {
@@ -19,13 +19,13 @@ abstract contract Pod is IPod {
         _;
     }
 
-    /// @dev Creates a new Pod contract, initialized with a reference to the parent token contract.
+    /// @dev Creates a new plugin contract, initialized with a reference to the parent token contract.
     /// @param token_ The address of the token contract
-    constructor(IERC20Pods token_) {
+    constructor(IERC20Plugins token_) {
         token = token_;
     }
 
-    /// @dev Updates the balances of two addresses in the pod as a result of any balance changes.
+    /// @dev Updates the balances of two addresses in the plugin as a result of any balance changes.
     /// Only the Token contract is allowed to call this function.
     /// @param from The address from which tokens were transferred
     /// @param to The address to which tokens were transferred
@@ -34,7 +34,7 @@ abstract contract Pod is IPod {
         _updateBalances(from, to, amount);
     }
 
-    /// @dev Updates the balances of two addresses in the pod as a result of any balance changes.
+    /// @dev Updates the balances of two addresses in the plugin as a result of any balance changes.
     /// Only the Token contract is allowed to call this function.
     /// @param from The address from which tokens were transferred
     /// @param to The address to which tokens were transferred
