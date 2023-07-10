@@ -1,8 +1,8 @@
-# ERC20Plugins
+# Token Plugins
 
-[![Build Status](https://github.com/1inch/erc20-plugins/workflows/CI/badge.svg)](https://github.com/1inch/erc20-plugins/actions)
-[![Coverage Status](https://codecov.io/gh/1inch/erc20-plugins/branch/master/graph/badge.svg?token=Z3D5O3XUYV)](https://codecov.io/gh/1inch/erc20-plugins)
-[![NPM Package](https://img.shields.io/npm/v/@1inch/erc20-plugins.svg)](https://www.npmjs.org/package/@1inch/erc20-plugins)
+[![Build Status](https://github.com/1inch/token-plugins/workflows/CI/badge.svg)](https://github.com/1inch/token-plugins/actions)
+[![Coverage Status](https://codecov.io/gh/1inch/token-plugins/branch/master/graph/badge.svg?token=Z3D5O3XUYV)](https://codecov.io/gh/1inch/token-plugins)
+[![NPM Package](https://img.shields.io/npm/v/@1inch/token-plugins.svg)](https://www.npmjs.org/package/@1inch/token-plugins)
 
 ERC20 extension enabling external smart contract based plugins to track balances of those users who opted-in to these plugins.
 
