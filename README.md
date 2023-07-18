@@ -6,7 +6,7 @@
 
 ### Overview
 
-This library introduces an extendable and secure system for ERC20-based tokens, inspired by the plugin concept prevalent in the web 2.0 world. By subscribing an account to various plugins, users can dynamically enhance the functionality of their tokens.
+This library introduces an extendable and secure system for ERC20-based tokens, inspired by the plugin concept widely used in the web 2.0 world. By subscribing an account to various plugins, users can dynamically enhance the functionality of their tokens.
 
 ### Functionality and Extension Capabilities
 Each time a balance of a connected account changes, the token contract notifies all plugins that the account has subscribed to. Each plugin implements the `_updateBalances` function, which processes change requests for a balance alteration, inclusive of balance change data (from/to addresses and amount). The plugin can then perform necessary actions according to its logic to extend the base token functionality.
@@ -34,7 +34,7 @@ The plugin system operates under the assumption that an account may subscribe to
 1. Inherit token using `contract MyToken is ERC20Plugins { ... }`.
 Or wrap it using `contract MyWrapper is ERC20Wrapper, ERC20Plugins { ... }`.
 This adds support for the plugin infrastructure.
-2. Create and deploy a plugin smart contract or choose an existing deployed plugin to add to wallets holding your token, then add the plugin to a wallet using `MyToken.addPlugin(plugin)`.
+2. Now any wallet can add the plugin to a wallet using `MyToken.addPlugin(plugin)` to utilize plugin features.
 3. Now every time the wallet balance changes, the plugin will be informed.
 
 ### Creating Your Own Plugin
