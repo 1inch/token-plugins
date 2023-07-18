@@ -40,3 +40,36 @@ This adds support for the plugin infrastructure.
 ### Creating Your Own Plugin
 1. Inherit the plugin using `contract MyPlugin is Plugin { ... }.`
 2. Implement the `_updateBalances` function to handle wallet balance changes.
+
+### Examples of simple token and plugin
+```Solidity
+// Simple token contract with plugin support
+contract HostTokenExample is ERC20Plugins {
+    constructor(string memory name, string memory symbol, uint256 pluginsCountLimit, uint256 pluginsCallGasLimit)
+        ERC20(name, symbol)
+        ERC20Plugins(pluginsCountLimit, pluginsCallGasLimit)
+    {} // solhint-disable-line no-empty-blocks
+
+    function mint(address account, uint256 amount) external {
+        _mint(account, amount);
+    }
+}
+
+// Simple plugin
+contract PluginExample is ERC20, Plugin {
+    constructor(string memory name, string memory symbol, IERC20Plugins token_)
+        ERC20(name, symbol)
+        Plugin(token_)
+    {} // solhint-disable-line no-empty-blocks
+
+    function _updateBalances(address from, address to, uint256 amount) internal override {
+        if (from == address(0)) {
+            _mint(to, amount);
+        } else if (to == address(0)) {
+            _burn(from, amount);
+        } else {
+            _transfer(from, to, amount);
+        }
+    }
+}
+```
