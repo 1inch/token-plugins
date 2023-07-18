@@ -20,7 +20,7 @@ This plugin facilitates farming without the need for asset transfer or locking o
 * [DelegatingPlugin](https://github.com/1inch/delegating) - *The 1inch fusion mode resolver delegation is based on this plugin.*
  This plugin allows an account balance to be delegated to another address. This can be advantageous for governance tokens if an account owner wants to delegate their voting power to another account without a physical token transfer. The owner can recall or redelegate their delegation at any time without locking their tokens in a governance contract.
 
- ### Security and limitations
+### Security and limitations
 The plugin system operates under the assumption that an account may subscribe to a malicious plugin. That is the reason why the following restrictions apply to each call:
 
 * If a plugin fails its execution and reverts, it won't impact the main flow. The failed plugin is bypassed, and execution continues.
