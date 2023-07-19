@@ -16,7 +16,7 @@ Each time a balance of a connected account changes, the token contract notifies 
 
 Keep in mind that the plugin's processing logic consumes additional gas, and operations that change an account balance will be more expensive in terms of gas. To reduce the gas impact the library implements a limit on the amount of gas that a plugin can spend and an account owner can choose which plugins to subscribe his account to.
 
-![Picture 1. Possible interactions](./src/img/scheme-n1.png)
+<img src='./src/img/scheme-n1.png' width='320' height='396'>
 
 Picture 1. Possible interactions
 
