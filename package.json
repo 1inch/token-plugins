@@ -1,6 +1,6 @@
 {
   "name": "@1inch/token-plugins",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "ERC20 extension enabling external smart contract based plugins to track balances of those users who opted-in to those plugins",
   "repository": {
     "type": "git",
@@ -13,28 +13,28 @@
   "author": "1inch",
   "license": "MIT",
   "dependencies": {
-    "@1inch/solidity-utils": "2.2.21",
-    "@openzeppelin/contracts": "4.8.2"
+    "@1inch/solidity-utils": "3.0.1",
+    "@openzeppelin/contracts": "4.9.2"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-chai-matchers": "1.0.6",
-    "@nomiclabs/hardhat-ethers": "2.2.2",
-    "@nomiclabs/hardhat-etherscan": "3.1.7",
+    "@nomicfoundation/hardhat-chai-matchers": "2.0.1",
+    "@nomicfoundation/hardhat-ethers": "3.0.4",
+    "@nomicfoundation/hardhat-verify": "1.0.4",
     "@openzeppelin/test-helpers": "0.5.16",
     "chai": "4.3.7",
-    "dotenv": "16.0.3",
-    "eslint": "8.36.0",
-    "eslint-config-standard": "17.0.0",
+    "dotenv": "16.3.1",
+    "eslint": "8.45.0",
+    "eslint-config-standard": "17.1.0",
     "eslint-plugin-import": "2.27.5",
-    "eslint-plugin-n": "15.6.1",
+    "eslint-plugin-n": "16.0.1",
     "eslint-plugin-promise": "6.1.1",
-    "ethers": "5.7.2",
-    "hardhat": "2.13.0",
-    "hardhat-deploy": "0.11.25",
+    "ethers": "6.6.5",
+    "hardhat": "2.17.0",
+    "hardhat-deploy": "0.11.34",
     "hardhat-gas-reporter": "1.0.9",
-    "rimraf": "4.4.0",
+    "rimraf": "5.0.1",
     "solhint": "3.4.1",
-    "solidity-coverage": "0.8.2"
+    "solidity-coverage": "0.8.4"
   },
   "scripts": {
     "clean": "rimraf artifacts cache coverage coverage.json contracts/hardhat-dependency-compiler",
