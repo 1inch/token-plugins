@@ -51,8 +51,8 @@ function shouldBehaveLikeERC20Plugins (initContracts) {
             it('hasPlugin should return true when plugin added by wallet', async function () {
                 const { erc20Plugins, plugins } = await loadFixture(initAndCreatePlugins);
                 await erc20Plugins.addPlugin(plugins[0]);
-                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.equals(true);
-                expect(await erc20Plugins.hasPlugin(wallet2, plugins[0])).to.be.equals(false);
+                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.true;
+                expect(await erc20Plugins.hasPlugin(wallet2, plugins[0])).to.be.false;
             });
 
             it('pluginsCount should return plugins amount which wallet using', async function () {
@@ -129,9 +129,9 @@ function shouldBehaveLikeERC20Plugins (initContracts) {
 
             it('should add plugin', async function () {
                 const { erc20Plugins, plugins } = await loadFixture(initAndCreatePlugins);
-                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.equals(false);
+                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.false;
                 await erc20Plugins.addPlugin(plugins[0]);
-                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.equals(true);
+                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.true;
             });
 
             it('should not add plugin twice from one wallet', async function () {
@@ -143,18 +143,18 @@ function shouldBehaveLikeERC20Plugins (initContracts) {
 
             it('should add the same plugin for different wallets', async function () {
                 const { erc20Plugins, plugins } = await loadFixture(initAndCreatePlugins);
-                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.equals(false);
-                expect(await erc20Plugins.hasPlugin(wallet2, plugins[0])).to.be.equals(false);
+                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.false;
+                expect(await erc20Plugins.hasPlugin(wallet2, plugins[0])).to.be.false;
                 await erc20Plugins.addPlugin(plugins[0]);
                 await erc20Plugins.connect(wallet2).addPlugin(plugins[0]);
-                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.equals(true);
-                expect(await erc20Plugins.hasPlugin(wallet2, plugins[0])).to.be.equals(true);
+                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.true;
+                expect(await erc20Plugins.hasPlugin(wallet2, plugins[0])).to.be.true;
             });
 
             it('should add different plugin', async function () {
                 const { erc20Plugins, plugins } = await loadFixture(initAndCreatePlugins);
-                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.equals(false);
-                expect(await erc20Plugins.hasPlugin(wallet1, plugins[1])).to.be.equals(false);
+                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.false;
+                expect(await erc20Plugins.hasPlugin(wallet1, plugins[1])).to.be.false;
                 await erc20Plugins.addPlugin(plugins[0]);
                 await erc20Plugins.addPlugin(plugins[1]);
                 expect(await erc20Plugins.plugins(wallet1)).to.have.deep.equals([await plugins[0].getAddress(), await plugins[1].getAddress()]);
@@ -184,9 +184,9 @@ function shouldBehaveLikeERC20Plugins (initContracts) {
 
             it('should remove plugin', async function () {
                 const { erc20Plugins, plugins } = await loadFixture(initAndAddOnePlugin);
-                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.equals(true);
+                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.true;
                 await erc20Plugins.removePlugin(plugins[0]);
-                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.equals(false);
+                expect(await erc20Plugins.hasPlugin(wallet1, plugins[0])).to.be.false;
             });
 
             it('should updateBalance via plugin only for wallets with non-zero balance', async function () {
