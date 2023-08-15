@@ -6,9 +6,9 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC20Plugins } from "../ERC20Plugins.sol";
 
 contract ERC20PluginsMock is ERC20Plugins {
-    constructor(string memory name, string memory symbol, uint256 pluginsCountLimit, uint256 pluginsCallGasLimit)
+    constructor(string memory name, string memory symbol, uint256 maxPluginsPerAccount, uint256 pluginsCallGasLimit)
         ERC20(name, symbol)
-        ERC20Plugins(pluginsCountLimit, pluginsCallGasLimit)
+        ERC20Plugins(maxPluginsPerAccount, pluginsCallGasLimit)
     {} // solhint-disable-line no-empty-blocks
 
     function mint(address account, uint256 amount) external {

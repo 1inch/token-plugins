@@ -27,7 +27,7 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     error ZeroPluginsLimit();
 
     /// @dev Limit of plugins per account
-    uint256 public immutable pluginsCountLimit;
+    uint256 public immutable maxPluginsPerAccount;
     /// @dev Gas limit for a single plugin call
     uint256 public immutable pluginsCallGasLimit;
 
@@ -41,7 +41,7 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
      */
     constructor(uint256 pluginsLimit_, uint256 pluginCallGasLimit_) {
         if (pluginsLimit_ == 0) revert ZeroPluginsLimit();
-        pluginsCountLimit = pluginsLimit_;
+        maxPluginsPerAccount = pluginsLimit_;
         pluginsCallGasLimit = pluginCallGasLimit_;
         _guard.init();
     }
@@ -134,7 +134,7 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
         if (plugin == address(0)) revert InvalidPluginAddress();
         if (IPlugin(plugin).token() != IERC20Plugins(address(this))) revert InvalidTokenInPlugin();
         if (!_plugins[account].add(plugin)) revert PluginAlreadyAdded();
-        if (_plugins[account].length() > pluginsCountLimit) revert PluginsLimitReachedForAccount();
+        if (_plugins[account].length() > maxPluginsPerAccount) revert PluginsLimitReachedForAccount();
 
         emit PluginAdded(account, plugin);
         uint256 balance = balanceOf(account);
