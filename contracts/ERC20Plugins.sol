@@ -29,7 +29,7 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     /// @dev Limit of plugins per account
     uint256 public immutable maxPluginsPerAccount;
     /// @dev Gas limit for a single plugin call
-    uint256 public immutable pluginsCallGasLimit;
+    uint256 public immutable pluginCallGasLimit;
 
     ReentrancyGuardLib.Data private _guard;
     mapping(address => AddressSet.Data) private _plugins;
@@ -42,7 +42,7 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     constructor(uint256 pluginsLimit_, uint256 pluginCallGasLimit_) {
         if (pluginsLimit_ == 0) revert ZeroPluginsLimit();
         maxPluginsPerAccount = pluginsLimit_;
-        pluginsCallGasLimit = pluginCallGasLimit_;
+        pluginCallGasLimit = pluginCallGasLimit_;
         _guard.init();
     }
 
@@ -172,7 +172,7 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     /// @dev try IPlugin(plugin).updateBalances{gas: _PLUGIN_CALL_GAS_LIMIT}(from, to, amount) {} catch {}
     function _updateBalances(address plugin, address from, address to, uint256 amount) private {
         bytes4 selector = IPlugin.updateBalances.selector;
-        uint256 gasLimit = pluginsCallGasLimit;
+        uint256 gasLimit = pluginCallGasLimit;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
             mstore(ptr, selector)

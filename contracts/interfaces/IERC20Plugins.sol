@@ -9,7 +9,7 @@ interface IERC20Plugins is IERC20 {
     event PluginRemoved(address account, address plugin);
 
     function maxPluginsPerAccount() external view returns(uint256);
-    function pluginsCallGasLimit() external view returns(uint256);
+    function pluginCallGasLimit() external view returns(uint256);
     function hasPlugin(address account, address plugin) external view returns(bool);
     function pluginsCount(address account) external view returns(uint256);
     function pluginAt(address account, uint256 index) external view returns(address);
