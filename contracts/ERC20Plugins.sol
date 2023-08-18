@@ -52,14 +52,14 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     /**
      * @dev Returns the number of plugins registered for an account.
      * @param account The address of the account.
-     * @return uint256 A number of plugins registered for the account.
+     * @return uint256 The number of plugins registered for the account.
      */
     function pluginsCount(address account) public view virtual returns(uint256) {
         return _plugins[account].length();
     }
 
     /**
-     * @dev Returns the address of a plugin at a specified index for a given account .
+     * @dev Returns the address of a plugin at a specified index for a given account.
      * @param account The address of the account.
      * @param index The index of the plugin to retrieve.
      * @return plugin The address of the plugin.
@@ -76,7 +76,6 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     function plugins(address account) public view virtual returns(address[] memory) {
         return _plugins[account].items.get();
     }
-
 
     /**
      * @dev Returns the balance of a given account.
