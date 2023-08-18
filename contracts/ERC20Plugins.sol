@@ -40,38 +40,28 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     }
 
     /**
-     * @dev Returns whether an account has a specific plugin.
-     * @param account The address of the account.
-     * @param plugin The address of the plugin.
-     * @return bool A boolean indicating whether the account has the specified plugin.
+     * @notice See {IERC20Plugins-hasPlugin}.
      */
     function hasPlugin(address account, address plugin) public view virtual returns(bool) {
         return _plugins[account].contains(plugin);
     }
 
     /**
-     * @dev Returns the number of plugins registered for an account.
-     * @param account The address of the account.
-     * @return uint256 The number of plugins registered for the account.
+     * @notice See {IERC20Plugins-pluginsCount}.
      */
     function pluginsCount(address account) public view virtual returns(uint256) {
         return _plugins[account].length();
     }
 
     /**
-     * @dev Returns the address of a plugin at a specified index for a given account.
-     * @param account The address of the account.
-     * @param index The index of the plugin to retrieve.
-     * @return plugin The address of the plugin.
+     * @notice See {IERC20Plugins-pluginAt}.
      */
     function pluginAt(address account, uint256 index) public view virtual returns(address) {
         return _plugins[account].at(index);
     }
 
     /**
-     * @dev Returns an array of all plugins owned by a given account.
-     * @param account The address of the account to query.
-     * @return plugins An array of plugin addresses.
+     * @notice See {IERC20Plugins-plugins}.
      */
     function plugins(address account) public view virtual returns(address[] memory) {
         return _plugins[account].items.get();
@@ -87,10 +77,7 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     }
 
     /**
-     * @dev Returns the balance of a given account if a specified plugin is added or zero.
-     * @param plugin The address of the plugin to query.
-     * @param account The address of the account to query.
-     * @return balance The account balance if the specified plugin is added and zero otherwise.
+     * @notice See {IERC20Plugins-pluginBalanceOf}.
      */
     function pluginBalanceOf(address plugin, address account) public nonReentrantView(_guard) view virtual returns(uint256) {
         if (hasPlugin(account, plugin)) {
@@ -100,23 +87,21 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     }
 
     /**
-     * @dev Adds a new plugin for the calling account.
-     * @param plugin The address of the plugin to add.
+     * @notice See {IERC20Plugins-addPlugin}.
      */
     function addPlugin(address plugin) public virtual {
         _addPlugin(msg.sender, plugin);
     }
 
     /**
-     * @dev Removes a plugin for the calling account.
-     * @param plugin The address of the plugin to remove.
+     * @notice See {IERC20Plugins-removePlugin}.
      */
     function removePlugin(address plugin) public virtual {
         _removePlugin(msg.sender, plugin);
     }
 
     /**
-     * @dev Removes all plugins for the calling account.
+     * @notice See {IERC20Plugins-removeAllPlugins}.
      */
     function removeAllPlugins() public virtual {
         _removeAllPlugins(msg.sender);
