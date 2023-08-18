@@ -27,7 +27,9 @@ abstract contract Plugin is IPlugin {
         token = token_;
     }
 
-
+    /**
+     * @notice See {IPlugin-updateBalances}.
+     */
     function updateBalances(address from, address to, uint256 amount) external onlyToken {
         _updateBalances(from, to, amount);
     }
