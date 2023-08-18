@@ -6,5 +6,13 @@ import { IERC20Plugins } from "./IERC20Plugins.sol";
 
 interface IPlugin {
     function token() external view returns(IERC20Plugins);
+
+    /**
+     * @dev Updates the balances of two addresses in the plugin as a result of any balance changes.
+     * Only the Token contract is allowed to call this function.
+     * @param from The address from which tokens were transferred
+     * @param to The address to which tokens were transferred
+     * @param amount The amount of tokens transferred
+     */
     function updateBalances(address from, address to, uint256 amount) external;
 }
