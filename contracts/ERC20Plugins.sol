@@ -19,13 +19,6 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     using AddressArray for AddressArray.Data;
     using ReentrancyGuardLib for ReentrancyGuardLib.Data;
 
-    error PluginAlreadyAdded();
-    error PluginNotFound();
-    error InvalidPluginAddress();
-    error InvalidTokenInPlugin();
-    error PluginsLimitReachedForAccount();
-    error ZeroPluginsLimit();
-
     /// @dev Limit of plugins per account
     uint256 public immutable maxPluginsPerAccount;
     /// @dev Gas limit for a single plugin call
