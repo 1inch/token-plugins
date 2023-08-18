@@ -68,9 +68,9 @@ Below is the example of token implementing plugin support and a simple plugin th
 ```solidity
 // Simple token contract with plugin support
 contract HostTokenExample is ERC20Plugins {
-    constructor(string memory name, string memory symbol, uint256 pluginsCountLimit, uint256 pluginsCallGasLimit)
+    constructor(string memory name, string memory symbol, uint256 maxPluginsPerAccount, uint256 pluginCallGasLimit)
         ERC20(name, symbol)
-        ERC20Plugins(pluginsCountLimit, pluginsCallGasLimit)
+        ERC20Plugins(maxPluginsPerAccount, pluginCallGasLimit)
     {} // solhint-disable-line no-empty-blocks
 
     function mint(address account, uint256 amount) external {

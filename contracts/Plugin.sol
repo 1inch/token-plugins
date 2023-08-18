@@ -19,25 +19,27 @@ abstract contract Plugin is IPlugin {
         _;
     }
 
-    /// @dev Creates a new plugin contract, initialized with a reference to the parent token contract.
-    /// @param token_ The address of the token contract
+    /**
+     * @dev Creates a new plugin contract, initialized with a reference to the parent token contract.
+     * @param token_ The address of the token contract
+     */
     constructor(IERC20Plugins token_) {
         token = token_;
     }
 
-    /// @dev Updates the balances of two addresses in the plugin as a result of any balance changes.
-    /// Only the Token contract is allowed to call this function.
-    /// @param from The address from which tokens were transferred
-    /// @param to The address to which tokens were transferred
-    /// @param amount The amount of tokens transferred
+    /**
+     * @notice See {IPlugin-updateBalances}.
+     */
     function updateBalances(address from, address to, uint256 amount) external onlyToken {
         _updateBalances(from, to, amount);
     }
 
-    /// @dev Updates the balances of two addresses in the plugin as a result of any balance changes.
-    /// Only the Token contract is allowed to call this function.
-    /// @param from The address from which tokens were transferred
-    /// @param to The address to which tokens were transferred
-    /// @param amount The amount of tokens transferred
+    /**
+     * @dev Updates the balances of two addresses in the plugin as a result of any balance changes.
+     * Only the Token contract is allowed to call this function.
+     * @param from The address from which tokens were transferred
+     * @param to The address to which tokens were transferred
+     * @param amount The amount of tokens transferred
+     */
     function _updateBalances(address from, address to, uint256 amount) internal virtual;
 }

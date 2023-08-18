@@ -229,8 +229,8 @@ function shouldBehaveLikeERC20Plugins (initContracts) {
 
         it('should not add more plugins than limit', async function () {
             const { erc20Plugins, plugins } = await loadFixture(initAndCreatePlugins);
-            const pluginsCountLimit = await erc20Plugins.pluginsCountLimit();
-            for (let i = 0; i < pluginsCountLimit; i++) {
+            const maxPluginsPerAccount = await erc20Plugins.maxPluginsPerAccount();
+            for (let i = 0; i < maxPluginsPerAccount; i++) {
                 await erc20Plugins.addPlugin(plugins[i]);
             }
 

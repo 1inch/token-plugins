@@ -19,17 +19,10 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     using AddressArray for AddressArray.Data;
     using ReentrancyGuardLib for ReentrancyGuardLib.Data;
 
-    error PluginAlreadyAdded();
-    error PluginNotFound();
-    error InvalidPluginAddress();
-    error InvalidTokenInPlugin();
-    error PluginsLimitReachedForAccount();
-    error ZeroPluginsLimit();
-
     /// @dev Limit of plugins per account
-    uint256 public immutable pluginsCountLimit;
+    uint256 public immutable maxPluginsPerAccount;
     /// @dev Gas limit for a single plugin call
-    uint256 public immutable pluginsCallGasLimit;
+    uint256 public immutable pluginCallGasLimit;
 
     ReentrancyGuardLib.Data private _guard;
     mapping(address => AddressSet.Data) private _plugins;
@@ -41,49 +34,38 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
      */
     constructor(uint256 pluginsLimit_, uint256 pluginCallGasLimit_) {
         if (pluginsLimit_ == 0) revert ZeroPluginsLimit();
-        pluginsCountLimit = pluginsLimit_;
-        pluginsCallGasLimit = pluginCallGasLimit_;
+        maxPluginsPerAccount = pluginsLimit_;
+        pluginCallGasLimit = pluginCallGasLimit_;
         _guard.init();
     }
 
     /**
-     * @dev Returns whether an account has a specific plugin.
-     * @param account The address of the account.
-     * @param plugin The address of the plugin.
-     * @return bool A boolean indicating whether the account has the specified plugin.
+     * @notice See {IERC20Plugins-hasPlugin}.
      */
     function hasPlugin(address account, address plugin) public view virtual returns(bool) {
         return _plugins[account].contains(plugin);
     }
 
     /**
-     * @dev Returns the number of plugins registered for an account.
-     * @param account The address of the account.
-     * @return uint256 A number of plugins registered for the account.
+     * @notice See {IERC20Plugins-pluginsCount}.
      */
     function pluginsCount(address account) public view virtual returns(uint256) {
         return _plugins[account].length();
     }
 
     /**
-     * @dev Returns the address of a plugin at a specified index for a given account .
-     * @param account The address of the account.
-     * @param index The index of the plugin to retrieve.
-     * @return plugin The address of the plugin.
+     * @notice See {IERC20Plugins-pluginAt}.
      */
     function pluginAt(address account, uint256 index) public view virtual returns(address) {
         return _plugins[account].at(index);
     }
 
     /**
-     * @dev Returns an array of all plugins owned by a given account.
-     * @param account The address of the account to query.
-     * @return plugins An array of plugin addresses.
+     * @notice See {IERC20Plugins-plugins}.
      */
     function plugins(address account) public view virtual returns(address[] memory) {
         return _plugins[account].items.get();
     }
-
 
     /**
      * @dev Returns the balance of a given account.
@@ -95,10 +77,7 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     }
 
     /**
-     * @dev Returns the balance of a given account if a specified plugin is added or zero.
-     * @param plugin The address of the plugin to query.
-     * @param account The address of the account to query.
-     * @return balance The account balance if the specified plugin is added and zero otherwise.
+     * @notice See {IERC20Plugins-pluginBalanceOf}.
      */
     function pluginBalanceOf(address plugin, address account) public nonReentrantView(_guard) view virtual returns(uint256) {
         if (hasPlugin(account, plugin)) {
@@ -108,23 +87,21 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     }
 
     /**
-     * @dev Adds a new plugin for the calling account.
-     * @param plugin The address of the plugin to add.
+     * @notice See {IERC20Plugins-addPlugin}.
      */
     function addPlugin(address plugin) public virtual {
         _addPlugin(msg.sender, plugin);
     }
 
     /**
-     * @dev Removes a plugin for the calling account.
-     * @param plugin The address of the plugin to remove.
+     * @notice See {IERC20Plugins-removePlugin}.
      */
     function removePlugin(address plugin) public virtual {
         _removePlugin(msg.sender, plugin);
     }
 
     /**
-     * @dev Removes all plugins for the calling account.
+     * @notice See {IERC20Plugins-removeAllPlugins}.
      */
     function removeAllPlugins() public virtual {
         _removeAllPlugins(msg.sender);
@@ -134,7 +111,7 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
         if (plugin == address(0)) revert InvalidPluginAddress();
         if (IPlugin(plugin).token() != IERC20Plugins(address(this))) revert InvalidTokenInPlugin();
         if (!_plugins[account].add(plugin)) revert PluginAlreadyAdded();
-        if (_plugins[account].length() > pluginsCountLimit) revert PluginsLimitReachedForAccount();
+        if (_plugins[account].length() > maxPluginsPerAccount) revert PluginsLimitReachedForAccount();
 
         emit PluginAdded(account, plugin);
         uint256 balance = balanceOf(account);
@@ -158,10 +135,11 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
         uint256 balance = balanceOf(account);
         unchecked {
             for (uint256 i = items.length; i > 0; i--) {
-                _plugins[account].remove(items[i - 1]);
-                emit PluginRemoved(account, items[i - 1]);
+                address item = items[i-1];
+                _plugins[account].remove(item);
+                emit PluginRemoved(account, item);
                 if (balance > 0) {
-                    _updateBalances(items[i - 1], account, address(0), balance);
+                    _updateBalances(item, account, address(0), balance);
                 }
             }
         }
@@ -172,7 +150,7 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     /// @dev try IPlugin(plugin).updateBalances{gas: _PLUGIN_CALL_GAS_LIMIT}(from, to, amount) {} catch {}
     function _updateBalances(address plugin, address from, address to, uint256 amount) private {
         bytes4 selector = IPlugin.updateBalances.selector;
-        uint256 gasLimit = pluginsCallGasLimit;
+        uint256 gasLimit = pluginCallGasLimit;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
             mstore(ptr, selector)
