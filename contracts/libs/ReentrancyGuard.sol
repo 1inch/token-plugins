@@ -62,7 +62,7 @@ contract ReentrancyGuardExt {
     using ReentrancyGuardLib for ReentrancyGuardLib.Data;
 
     /**
-     * @dev Modifier that ensures a function can only be called once in the same block.
+     * @dev Modifier that prevents a contract from calling itself, directly or indirectly.
      * @param self The storage reference to the struct.
      */
     modifier nonReentrant(ReentrancyGuardLib.Data storage self) {
@@ -72,7 +72,7 @@ contract ReentrancyGuardExt {
     }
 
     /**
-     * @dev Modifier that ensures a function can only be called once in the same block in view mode.
+     * @dev Modifier that prevents calls to a function from `nonReentrant` functions, directly or indirectly.
      * @param self The storage reference to the struct.
      */
     modifier nonReentrantView(ReentrancyGuardLib.Data storage self) {
