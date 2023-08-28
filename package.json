@@ -1,6 +1,6 @@
 {
   "name": "@1inch/token-plugins",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "ERC20 extension enabling external smart contract based plugins to track balances of those users who opted-in to those plugins",
   "repository": {
     "type": "git",
