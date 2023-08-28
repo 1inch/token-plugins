@@ -184,7 +184,7 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
                     uint256 j;
                     for (j = 0; j < bLength; j++) {
                         if (plugin == b[j]) {
-                            // Both parties are participating of the same plugin
+                            // Both parties are participating in the same plugin
                             _updateBalances(plugin, from, to, amount);
                             b[j] = address(0);
                             break;
