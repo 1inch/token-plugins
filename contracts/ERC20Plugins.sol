@@ -131,11 +131,11 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     }
 
     function _removeAllPlugins(address account) internal virtual {
-        address[] memory items = _plugins[account].items.get();
+        address[] memory pluginItems = _plugins[account].items.get();
         uint256 balance = balanceOf(account);
         unchecked {
-            for (uint256 i = items.length; i > 0; i--) {
-                address item = items[i-1];
+            for (uint256 i = pluginItems.length; i > 0; i--) {
+                address item = pluginItems[i-1];
                 _plugins[account].remove(item);
                 emit PluginRemoved(account, item);
                 if (balance > 0) {
@@ -168,39 +168,37 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
         }
     }
 
-    // ERC20 Overrides
-
     function _afterTokenTransfer(address from, address to, uint256 amount) internal nonReentrant(_guard) override virtual {
         super._afterTokenTransfer(from, to, amount);
 
         unchecked {
             if (amount > 0 && from != to) {
-                address[] memory a = _plugins[from].items.get();
-                address[] memory b = _plugins[to].items.get();
-                uint256 aLength = a.length;
-                uint256 bLength = b.length;
+                address[] memory pluginsFrom = _plugins[from].items.get();
+                address[] memory pluginsTo = _plugins[to].items.get();
+                uint256 pluginsFromLength = pluginsFrom.length;
+                uint256 pluginsToLength = pluginsTo.length;
 
-                for (uint256 i = 0; i < aLength; i++) {
-                    address plugin = a[i];
+                for (uint256 i = 0; i < pluginsFromLength; i++) {
+                    address plugin = pluginsFrom[i];
 
                     uint256 j;
-                    for (j = 0; j < bLength; j++) {
-                        if (plugin == b[j]) {
-                            // Both parties are participating of the same plugin
+                    for (j = 0; j < pluginsToLength; j++) {
+                        if (plugin == pluginsTo[j]) {
+                            // Both parties are participating in the same plugin
                             _updateBalances(plugin, from, to, amount);
-                            b[j] = address(0);
+                            pluginsTo[j] = address(0);
                             break;
                         }
                     }
 
-                    if (j == bLength) {
+                    if (j == pluginsToLength) {
                         // Sender is participating in a plugin, but receiver is not
                         _updateBalances(plugin, from, address(0), amount);
                     }
                 }
 
-                for (uint256 j = 0; j < bLength; j++) {
-                    address plugin = b[j];
+                for (uint256 j = 0; j < pluginsToLength; j++) {
+                    address plugin = pluginsTo[j];
                     if (plugin != address(0)) {
                         // Receiver is participating in a plugin, but sender is not
                         _updateBalances(plugin, address(0), to, amount);

@@ -44,6 +44,7 @@ interface IERC20Plugins is IERC20 {
 
     /**
      * @dev Returns the address of a plugin at a specified index for a given account.
+     * The function will revert if index is greater or equal than `pluginsCount(account)`.
      * @param account The address of the account.
      * @param index The index of the plugin to retrieve.
      * @return plugin The address of the plugin.
