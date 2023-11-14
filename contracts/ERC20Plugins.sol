@@ -168,8 +168,8 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
         }
     }
 
-    function _afterTokenTransfer(address from, address to, uint256 amount) internal nonReentrant(_guard) override virtual {
-        super._afterTokenTransfer(from, to, amount);
+    function _update(address from, address to, uint256 amount) internal nonReentrant(_guard) override virtual {
+        super._update(from, to, amount);
 
         unchecked {
             if (amount > 0 && from != to) {

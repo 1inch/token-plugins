@@ -2,15 +2,15 @@
 # yarn lockfile v1
 
 
-"@1inch/solidity-utils@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@1inch/solidity-utils/-/solidity-utils-3.0.1.tgz#afce60992fff724b09d570801ed0381ac31402cf"
-  integrity sha512-KbLhh1JgjBIJAq6B+AGOuyLNlEf5bRvoMZb509YMeec3s3iLbTrtI5D76b+HGKR98wU3HuRiDac/7j4ck2bjBQ==
+"@1inch/solidity-utils@3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@1inch/solidity-utils/-/solidity-utils-3.3.0.tgz#409dec87901f465ca7cd291df30155f50f5ab34a"
+  integrity sha512-mkS/Ej1wXO+Xa3ztVB5KKmKVwXCp5zrXcLiCEwkHyouOBauxYWp4/icj/wOBapIwVaju9ha5u1HlwbIlbl2gbQ==
   dependencies:
     "@metamask/eth-sig-util" "6.0.0"
     "@nomicfoundation/hardhat-ethers" "3.0.3"
     "@nomicfoundation/hardhat-network-helpers" "1.0.8"
-    "@openzeppelin/contracts" "4.9.2"
+    "@openzeppelin/contracts" "5.0.0"
     "@uniswap/permit2-sdk" "1.2.0"
     ethereumjs-util "7.1.5"
     ethers "6.6.3"
@@ -915,10 +915,10 @@
     find-up "^4.1.0"
     fs-extra "^8.1.0"
 
-"@openzeppelin/contracts@4.9.2":
-  version "4.9.2"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.9.2.tgz#1cb2d5e4d3360141a17dbc45094a8cad6aac16c1"
-  integrity sha512-mO+y6JaqXjWeMh9glYVzVu8HYPGknAAnWyxTRhGeckOruyXQMNnlcW6w/Dx9ftLeIQk6N+ZJFuVmTwF7lEIFrg==
+"@openzeppelin/contracts@5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-5.0.0.tgz#ee0e4b4564f101a5c4ee398cd4d73c0bd92b289c"
+  integrity sha512-bv2sdS6LKqVVMLI5+zqnNrNU/CA+6z6CmwFXm/MzmOPBRSO5reEJN7z0Gbzvs0/bv/MZZXNklubpwy3v2+azsw==
 
 "@openzeppelin/test-helpers@0.5.16":
   version "0.5.16"
