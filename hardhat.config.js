@@ -5,13 +5,9 @@ require('solidity-coverage');
 require('hardhat-deploy');
 require('hardhat-gas-reporter');
 require('dotenv').config();
+const { Networks, getNetwork } = require('@1inch/solidity-utils/hardhat-setup');
 
-const { networks, etherscan } = require('./hardhat.networks');
-
-function getNetwork () {
-    const index = process.argv.findIndex((arg) => arg === '--network') + 1;
-    return index !== 0 ? process.argv[index] : 'unknown';
-}
+const { networks, etherscan } = (new Networks()).registerAll();
 
 module.exports = {
     etherscan,
