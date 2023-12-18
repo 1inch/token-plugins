@@ -11,11 +11,11 @@ import { IERC20Plugins } from "./interfaces/IERC20Plugins.sol";
 abstract contract Plugin is IPlugin {
     error AccessDenied();
 
-    IERC20Plugins public immutable token;
+    IERC20Plugins public immutable TOKEN;
 
     /// @dev Throws an error if the caller is not the token contract
     modifier onlyToken {
-        if (msg.sender != address(token)) revert AccessDenied();
+        if (msg.sender != address(TOKEN)) revert AccessDenied();
         _;
     }
 
@@ -24,7 +24,7 @@ abstract contract Plugin is IPlugin {
      * @param token_ The address of the token contract
      */
     constructor(IERC20Plugins token_) {
-        token = token_;
+        TOKEN = token_;
     }
 
     /**
