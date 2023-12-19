@@ -19,13 +19,13 @@ interface IERC20Plugins is IERC20 {
      * @dev Returns the maximum allowed number of plugins per account.
      * @return pluginsLimit The maximum allowed number of plugins per account.
      */
-    function maxPluginsPerAccount() external view returns(uint256 pluginsLimit);
+    function MAX_PLUGINS_PER_ACCOUNT() external view returns(uint256 pluginsLimit); // solhint-disable-line func-name-mixedcase
 
     /**
      * @dev Returns the gas limit allowed to be spend by plugin per call.
      * @return gasLimit The gas limit allowed to be spend by plugin per call.
      */
-    function pluginCallGasLimit() external view returns(uint256 gasLimit);
+    function PLUGIN_CALL_GAS_LIMIT() external view returns(uint256 gasLimit); // solhint-disable-line func-name-mixedcase
 
     /**
      * @dev Returns whether an account has a specific plugin.

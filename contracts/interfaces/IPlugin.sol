@@ -9,7 +9,7 @@ interface IPlugin {
      * @dev Returns the token which this plugin belongs to.
      * @return erc20 The IERC20Plugins token.
      */
-    function token() external view returns(IERC20Plugins erc20);
+    function TOKEN() external view returns(IERC20Plugins erc20); // solhint-disable-line func-name-mixedcase
 
     /**
      * @dev Updates the balances of two addresses in the plugin as a result of any balance changes.

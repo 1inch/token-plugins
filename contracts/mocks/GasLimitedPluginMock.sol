@@ -8,13 +8,13 @@ import { IERC20Plugins, Plugin } from "../Plugin.sol";
 contract GasLimitedPluginMock is ERC20, Plugin {
     error InsufficientGas();
 
-    uint256 public immutable gasLimit;
+    uint256 public immutable GAS_LIMIT;
 
     constructor(uint256 gasLimit_, IERC20Plugins token)
         ERC20(type(GasLimitedPluginMock).name, "GLPM")
         Plugin(token)
     {
-        gasLimit = gasLimit_;
+        GAS_LIMIT = gasLimit_;
     }
 
     function _updateBalances(address from, address to, uint256 amount) internal override {
@@ -26,7 +26,7 @@ contract GasLimitedPluginMock is ERC20, Plugin {
             _transfer(from, to, amount);
         }
 
-        if (gasleft() < gasLimit) {
+        if (gasleft() < GAS_LIMIT) {
             revert InsufficientGas();
         }
     }

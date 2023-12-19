@@ -20,9 +20,9 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     using ReentrancyGuardLib for ReentrancyGuardLib.Data;
 
     /// @dev Limit of plugins per account
-    uint256 public immutable maxPluginsPerAccount;
+    uint256 public immutable MAX_PLUGINS_PER_ACCOUNT;
     /// @dev Gas limit for a single plugin call
-    uint256 public immutable pluginCallGasLimit;
+    uint256 public immutable PLUGIN_CALL_GAS_LIMIT;
 
     ReentrancyGuardLib.Data private _guard;
     mapping(address => AddressSet.Data) private _plugins;
@@ -34,8 +34,8 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
      */
     constructor(uint256 pluginsLimit_, uint256 pluginCallGasLimit_) {
         if (pluginsLimit_ == 0) revert ZeroPluginsLimit();
-        maxPluginsPerAccount = pluginsLimit_;
-        pluginCallGasLimit = pluginCallGasLimit_;
+        MAX_PLUGINS_PER_ACCOUNT = pluginsLimit_;
+        PLUGIN_CALL_GAS_LIMIT = pluginCallGasLimit_;
         _guard.init();
     }
 
@@ -109,9 +109,9 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
 
     function _addPlugin(address account, address plugin) internal virtual {
         if (plugin == address(0)) revert InvalidPluginAddress();
-        if (IPlugin(plugin).token() != IERC20Plugins(address(this))) revert InvalidTokenInPlugin();
+        if (IPlugin(plugin).TOKEN() != IERC20Plugins(address(this))) revert InvalidTokenInPlugin();
         if (!_plugins[account].add(plugin)) revert PluginAlreadyAdded();
-        if (_plugins[account].length() > maxPluginsPerAccount) revert PluginsLimitReachedForAccount();
+        if (_plugins[account].length() > MAX_PLUGINS_PER_ACCOUNT) revert PluginsLimitReachedForAccount();
 
         emit PluginAdded(account, plugin);
         uint256 balance = balanceOf(account);
@@ -150,7 +150,7 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     /// @dev try IPlugin(plugin).updateBalances{gas: _PLUGIN_CALL_GAS_LIMIT}(from, to, amount) {} catch {}
     function _updateBalances(address plugin, address from, address to, uint256 amount) private {
         bytes4 selector = IPlugin.updateBalances.selector;
-        uint256 gasLimit = pluginCallGasLimit;
+        uint256 gasLimit = PLUGIN_CALL_GAS_LIMIT;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
             mstore(ptr, selector)
@@ -168,8 +168,8 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
         }
     }
 
-    function _afterTokenTransfer(address from, address to, uint256 amount) internal nonReentrant(_guard) override virtual {
-        super._afterTokenTransfer(from, to, amount);
+    function _update(address from, address to, uint256 amount) internal nonReentrant(_guard) override virtual {
+        super._update(from, to, amount);
 
         unchecked {
             if (amount > 0 && from != to) {
