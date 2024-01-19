@@ -80,7 +80,7 @@ To add a plugin to an account, a user-friendly web application can be developed 
 
 ## ERC20Plugins.sol (Plugin-enabled ERC20 Token Contract)
 - Native inheritance from OpenZeppelin’s ERC20 library (for turnkey deployment)
--  token contract if creating a new ERC20 token, OR can be inherited as a wrapper for a pre-existing “non-plugin-enabled” token
+- Includes a built-in token contract if creating a new ERC20, OR can be inherited as a wrapper for a pre-existing “non-plugin-enabled” ERC20
 - Main function: `updateBalances` - Calls to each connected plugin
 
 ### Includes
@@ -110,7 +110,7 @@ To add a plugin to an account, a user-friendly web application can be developed 
 
 - A basic template for plugin creation.
 - Tracks an account’s balances through `_updateBalances`.
-- Provides advanced functionalities, such as farming, delegation, etc., without moving tokens.
+- Provides advanced functionalities, such as farming, delegation, etc., without moving the plugged in tokens.
 
 ### Includes
 
@@ -121,7 +121,7 @@ To add a plugin to an account, a user-friendly web application can be developed 
   
 #### State Variable
 
-- `TOKEN`: Public immutable variable storing the reference to the parent ERC20 token contract.
+- `TOKEN`: Stores a reference to the plugin-enabled ERC20 token contract.
 
 #### Modifiers
 
