@@ -16,7 +16,7 @@
 
 ## Overview
 
-Token plugins are smart contracts that extend the capabilities of plugin-enabled and plugin-enabled wrapped ERC20 tokens. They allow for additional accounting to be added, without the need to deposit your tokens into a contract. **_This is a revolutionary step in the evolution of DeFi_**, as the entire ecosystem has historically relied upon the transfer of tokens in and out of external contracts to achieve enhanced capabilities! 
+Token plugins are smart contracts that extend the capabilities of plugin-enabled ERC20 tokens and plugin-enabled ERC20 wrappers. They allow for additional accounting to be added, without the need to deposit your tokens into a contract. **_This is a revolutionary step in the evolution of DeFi_**, as the entire ecosystem has historically relied upon the transfer of tokens in and out of external contracts to achieve enhanced capabilities! 
 
 By design, token plugins prevent several common attack vectors and inherently create a fundamental level of security within every token incentive mechanism. Users no longer have to trust their funds in an external contract, whether it be for farming, borrowing/lending, or delegating, etc., therefore adding a fundamental layer of security.
 
@@ -53,7 +53,7 @@ Token Plugins create a massive number of possibilities in the DeFi space. The sk
 
 # Implementation
 
-![ERC20Plugins](https://i.imgur.com/5195e7b.png)
+![ERC20Plugins](./src/img/PluginsDiagram.png)
 
 Connecting a token contract with the 1inch Token Plugins is a straightforward process. If you’re creating a brand new token contract or migrating an existing one, you can simply inherit from the [plugin-enabled ERC20](https://github.com/1inch/token-plugins/blob/master/contracts/ERC20Plugins.sol) contract OR wrap an existing token and inherit plugin functionality within the wrapper (`contract MyWrapper is ERC20Wrapper, ERC20Plugins { ... }`). Subsequently, any plugin (deployed as a [separate contract](https://github.com/1inch/token-plugins/blob/master/contracts/Plugin.sol)) can be connected to your plugin-enabled ERC20, enabling it to track balance updates of the underlying asset efficiently. 
 
@@ -61,11 +61,11 @@ In other words, 1inch Token Plugins require inheritance from an independent, “
 
 All plugins will only track the balances of participating accounts. So all non-participants are represented as “0 addresses”. If an account is not participating in a plugin and receives a plugin-enabled token, the `From` and `To` amounts under `_updateBalances` will be represented as 0.
 
-![participants](https://i.imgur.com/Igap8XI.png)
+![participants](./src/img/_updateBalances2.png)
 
 Therefore, if a non-participant sends a plugin-enabled token to an existing participant, it will effectively “mint” the tracked balance. If a participant sends a plugin-enabled token to a non-participant, it will effectively “burn” the tracked balance.
 
-![Token Transfers](https://i.imgur.com/P0qgHdk.png)
+![Token Transfers](./src/img/TokenTransferDiagram.png)
 
 For security purposes, plugins are designed with several fail-safes, including a maximum number of usable plugins, custom gas limits, a reentrancy guard, and native isolation from the main contract state. The maximum plugins and gas limit can be initialized as state variables using `MAX_PLUGINS_PER_ACCOUNT` and `PLUGIN_CALL_GAS_LIMIT`, respectively. For reentrancy prevention, `ReentrancyGuardExt` is included from OpenZeppelin’s library. Finally, for native isolation from the token contract, a single method with only three arguments (`To`, `From`, and `Amount`) is used. This simple architecture results in a dynamic (and risk-free!) enhancement of any ERC20 contract’s capabilities.
 
