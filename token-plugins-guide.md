@@ -16,15 +16,15 @@
 
 ## Overview
 
-Token plugins are smart contracts that extend the capabilities of plugin-enabled ERC20 tokens and plugin-enabled ERC20 wrappers. They allow for additional accounting to be added, without the need to deposit your tokens into a contract. **_This is a revolutionary step in the evolution of DeFi_**, as the entire ecosystem has historically relied upon the transfer of tokens in and out of external contracts to achieve enhanced capabilities! 
+Token plugins are smart contracts that extend the capabilities of plugin-enabled ERC20 tokens and plugin-enabled ERC20 wrappers. They allow for additional accounting to be added, without the need to deposit your tokens into a contract. **_This is a revolutionary step in the evolution of DeFi_**, as the entire ecosystem has historically relied upon the transfer of tokens in and out of external contracts to achieve enhanced capabilities! The process of creating and deploying plugins is completely open and permissionless, and holders of plugin-compatible ERC20 tokens can freely participate with any plugin of their choosing.
 
 By design, token plugins prevent several common attack vectors and inherently create a fundamental level of security within every token incentive mechanism. Users no longer have to trust their funds in an external contract, whether it be for farming, borrowing/lending, or delegating, etc., therefore adding a fundamental layer of security.
 
 ## Primary Benefits
 - 100% permissionless, open to all participants.
-- Risk-free participation: Token plugins can only update with an account’s balance change. They cannot approve, mint, burn, transfer, or overwrite storage.
-- Users can connect multiple plugins, allowing for simultaneous participation in multiple incentive programs or governance systems, etc.
-- Implementation is less than 100 lines of code; very simple to adopt.
+- Risk-free participation: Token plugins do not require any approval, deposit, or transfer of funds into an external contract for participation. 
+- Users can connect with multiple plugins, allowing for simultaneous involvement in multiple incentive programs or governance systems, etc. (subject to a predefined limit, set at deployment).
+- Implementation is only 150 lines of code; very simple to adopt.
 - Heavily audited by OpenZeppelin, providing the highest standard of security.
 - Built-in [reentrancy protection](https://github.com/1inch/token-plugins/blob/master/contracts/libs/ReentrancyGuard.sol).
 - A plugin can be represented by its very own associated ERC20 (custom inheritance).
