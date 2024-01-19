@@ -16,7 +16,7 @@
 
 ## Overview
 
-Token plugins are smart contracts that extend the capabilities of plugin-enabled ERC20 tokens and plugin-enabled ERC20 wrappers. They allow for additional accounting to be added, without the need to deposit your tokens into a contract. **_This is a revolutionary step in the evolution of DeFi_**, as the entire ecosystem has historically relied upon the transfer of tokens in and out of external contracts to achieve enhanced capabilities! The process of creating and deploying plugins is completely open and permissionless, and holders of plugin-compatible ERC20 tokens can freely participate with any plugin of their choosing.
+Token plugins are smart contracts that extend the capabilities of plugin-enabled ERC20 tokens and plugin-enabled ERC20 wrappers. They allow for additional accounting to be added, without the need to deposit your tokens into a contract. **_This is a revolutionary step in the evolution of DeFi_**, as the entire ecosystem has historically relied upon the transfer of tokens in and out of external contracts to achieve enhanced capabilities! The process of creating and deploying plugins is completely open and permissionless, and holders of plugin-compatible ERC20 tokens can freely participate with any plugin of their choosing - without risking the loss of assets.
 
 By design, token plugins prevent several common attack vectors and inherently create a fundamental level of security within every token incentive mechanism. Users no longer have to trust their funds in an external contract, whether it be for farming, borrowing/lending, or delegating, etc., therefore adding a fundamental layer of security.
 
