@@ -6,47 +6,48 @@
 
 [Implementation](#implementation)
 
-[Overview of Contract Structure](#overview-of-contract-structure)
-   - [ERC20Plugins.sol (Abstract Plugin-enabled ERC20 contract)](#erc20pluginssol-plugin-enabled-erc20-token-contract)
-   - [Plugin.sol (Abstract Plugin contract)](#pluginsol-abstract-plugin-contract)
-
 [Deployed Examples](#deployed-examples)
 
 [Helpful Links](#helpful-links)
 
 ## Overview
 
-Token plugins are smart contracts that extend the capabilities of plugin-enabled ERC20 tokens and plugin-enabled ERC20 wrappers. They allow for additional accounting to be added, without the need to deposit your tokens into a contract. **_This is a revolutionary step in the evolution of DeFi_**, as the entire ecosystem has historically relied upon the transfer of tokens in and out of external contracts to achieve enhanced capabilities! The process of creating and deploying plugins is completely open and permissionless, and holders of plugin-compatible ERC20 tokens can freely participate with any plugin of their choosing - without risking the loss of assets.
+Token plugins are smart contracts that extend the capabilities of ERC20 tokens and wrappers by adding custom accounting features to the original token. The major benefit, and a key difference from existing solutions, is that these do not require token transfers to a special smart contract, as is commonly seen in farming or delegating protocols. Another beneficial point is that once an ERC20 plugin code is deployed, it can be reused by any tokens that support the 1inch plugin standard.
 
-By design, token plugins prevent several common attack vectors and inherently create a fundamental level of security within every token incentive mechanism. Users no longer have to trust their funds in an external contract, whether it be for farming, borrowing/lending, or delegating, etc., therefore adding a fundamental layer of security.
+Support for plugins on the side of a token is as straightforward as the usage of any other ERC20 extensions (e.g., OpenZeppelin ERC20 extensions). The deployment and usage are permissionless from the perspective of a token contract owner, since the holder is the actor who decides which plugin to subscribe to.
+
+The token plugins standard is designed to be secure and to prevent asset loss, gas, and DoS attacks on transfers.
 
 ## Primary Benefits
-- 100% permissionless, open to all participants.
-- Risk-free participation: Token plugins do not require any approval, deposit, or transfer of funds into an external contract for participation. 
+- 100% permissionless from the token contract owner; open to all participants.
+- Risk-free participation: Token plugins do not require any approval, deposit, or transfer of funds into an external contract for participation.
 - Users can connect with multiple plugins, allowing for simultaneous involvement in multiple incentive programs or governance systems, etc. (subject to a predefined limit, set at deployment).
 - Implementation is only 150 lines of code; very simple to adopt.
-- Heavily audited by OpenZeppelin, providing the highest standard of security.
+- Audited by top-notch firms such as OpenZeppelin, providing the highest standard of security.
 - Built-in [reentrancy protection](https://github.com/1inch/token-plugins/blob/master/contracts/libs/ReentrancyGuard.sol).
-- A plugin can be represented by its very own associated ERC20 (custom inheritance).
+- A plugin can be represented by its very own associated ERC20 (custom inheritance), enabling a participant to receive benefits for simply holding the token.
 - NFT (ERC721) and Multi-token (ERC1155) support are coming soon!
-
-This new system embodies the core principles of Web3 technology - decentralization, security, and user empowerment. Token Plugins are designed to seamlessly integrate with and enhance existing token contracts and incentive structures, providing a simple solution for token utility and interoperability.
 
 ## Use-Cases
 
-Token Plugins create a massive number of possibilities in the DeFi space. The sky's the limit! Here are several existing (and potential) examples:
+Token Plugins create a massive number of possibilities in the DeFi space. The sky's the limit! 
 
-- **Complex staking:** Can offer different tiers of rewards based on the duration of the stake (or amount staked).
-- **Farming:** Allows token holders to participate in multiple farming activities simultaneously, providing a new level of diversification and automation, all without having to deposit tokens into a farming contract. (See [1inch Fusion pods](https://etherscan.io/address/0x806d9073136c8A4A3fD21E0e708a9e17C87129e8#code))
-- **Delegation:** Useful in governance and voting, token plugins can track delegated balances, enhancing the utility of governance tokens. 
-- **Conditional transactions and/or escrow:** A plugin could allow tokens to be locked until certain conditions are met, like the completion of a service, time-based milestones, or the achievement of any custom milestone. (Think service economy like Uber or AirBnB etc.)
-- **Taxation or fee collection:** Token plugins can be used to track an account’s balances and automatically deduct a specific tax percentage based on pre-specified conditions.
+Here are several existing (and potential) examples:
+- **Alternative to staking:** Can account for different tiers of rewards based on the duration of time that a plugin-associated ERC20’s is held.
+- **Farming:** Allows token holders to participate in multiple farming activities simultaneously, providing a new level of diversification and automation, all without having to deposit tokens into a farming contract.
+(See [1inch Fusion pods](https://etherscan.io/address/0x806d9073136c8A4A3fD21E0e708a9e17C87129e8#code))
+- **Delegation:** Useful in governance and voting, token plugins can track delegated balances, enhancing the utility of governance tokens.
+- **Taxation or fee collection:** Token plugins could be used to track an account’s balances, and then call an external contract to automatically deduct a specific tax percentage based on pre-specified conditions. 
 - **Loyalty points and rewards programs:** Can be applied in systems that reward users for platform usage over time. (like airline miles, credit card points, or web3 loyalty points)
+
 
 ## Limitations
 
-- **Plugin Quantity:** The contract deployer can establish a limit on the number of plugins managed under the plugin management contract.
-- **Increased Gas Consumption:** Additional gas is consumed due to the processing logic of the token plugins. A custom gas limit constructor is included to mitigate this.
+Any plugin's processing logic consumes additional gas, with external operations that change an account balance incurring higher costs. To mitigate this, the plugin extension sets a limit on the gas consumption per plugin and caps the maximum amount of gas that can be spent.
+
+- **Plugin Quantity:** The contract deployer should establish a limit on the number of plugins managed under the plugin management contract. 
+- **Maximum amount of gas usage:** the plugin management contract limits the amount of gas any plugin can use to avoid overspent and gas attacks. It is highly recommended not to change beyond the recommended amount of 140,000.
+- **Only works with transferrable tokens:** By fundamental design, plugins are unable to integrate with tokens whose balances can update without transfers (such as rebase tokens).
 
 
 ---
@@ -63,75 +64,22 @@ All plugins will only track the balances of participating accounts. So all non-p
 
 ![participants](./src/img/_updateBalances2.png)
 
-Therefore, if a non-participant sends a plugin-enabled token to an existing participant, it will effectively “mint” the tracked balance. If a participant sends a plugin-enabled token to a non-participant, it will effectively “burn” the tracked balance.
-
-![Token Transfers](./src/img/TokenTransferDiagram.png)
-
 For security purposes, plugins are designed with several fail-safes, including a maximum number of usable plugins, custom gas limits, a reentrancy guard, and native isolation from the main contract state. The maximum plugins and gas limit can be initialized as state variables using `MAX_PLUGINS_PER_ACCOUNT` and `PLUGIN_CALL_GAS_LIMIT`, respectively. For reentrancy prevention, `ReentrancyGuardExt` is included from OpenZeppelin’s library. Finally, for native isolation from the token contract, a single method with only three arguments (`To`, `From`, and `Amount`) is used. This simple architecture results in a dynamic (and risk-free!) enhancement of any ERC20 contract’s capabilities.
+
+When developing a new plugin, you'll have to keep the following security restrictions in mind:
+
+- If a plugin's execution fails and reverts, it won't impact the main flow. The failed plugin is bypassed, and execution continues.
+- Each plugin has a gas limit set by the parent contract. If there is insufficient gas, it won't affect the execution of the main flow.
+- An account can have a limited number of plugins connected, as set by the plugin-enabled ERC20 "host" contract.
+- Plugins are executed in the context specified in their contract (the parent contract uses a call, not delegatecall).
+- Plugins cannot alter the state of the calling contract.
+- Plugins cannot be reentered.
 
 ## How do accounts (users) add or remove a plugin?
 
 To add a plugin to an account, a user-friendly web application can be developed and integrated with any injected wallet provider for simple account connection and signature. This simplifies the process of selecting and subscribing to plugins (see [1inch resolver plugins](https://app.1inch.io/#/1/dao/delegate)). Alternatively, an advanced user can subscribe to a plugin by directly interacting with the smart contract using a web3 wallet and the contract's ABI. Both methods require the user to initiate a transaction to call the `addPlugin` function of the token contract, which subscribes their account to the chosen plugin. To remove a plugin, the account needs to call either `removePlugin` or `removeAllPlugins`, depending on its needs.
  
-
 ---
-
-# Overview of Contract Structure
-
-## ERC20Plugins.sol (Plugin-enabled ERC20 Token Contract)
-- Native inheritance from OpenZeppelin’s ERC20 library (for turnkey deployment)
-- Includes a built-in token contract if creating a new ERC20, OR can be inherited as a wrapper for a pre-existing “non-plugin-enabled” ERC20
-- Main function: `updateBalances` - Calls to each connected plugin
-
-### Includes
-
-- **State Variables** (initialized in the constructor):
-  - `MAX_PLUGINS_PER_ACCOUNT`: Restricts the maximum number of plugins that a token can connect to.
-  - `PLUGIN_CALL_GAS_LIMIT`: Specifies the maximum amount of gas that can be spent for any given call.
-  - `ReentrancyGuardExt`: Imported reentrancy protection from OpenZeppelin’s library.
-
-#### Functions
-
-- `_updateBalances` 
-  - Returns balance updates from the plugin upon each relevant event. This allows the plugin to execute it's custom logic and extend the plugin-enabled ERC20 token's functionality.
-  - Ensures gas usage does not breach the limit set within `PLUGIN_CALL_GAS_LIMIT`.
-- `balanceOf`: Returns the entire token balance of an account.
-- `pluginBalanceOf`: Returns the balance of a token for a specific plugin.
-- `hasPlugin`: Checks to see if a specific plugin is associated with an account.
-- `pluginsCount`: Returns the total number of plugins associated with a specific account.
-- `pluginAt`: Returns the address for a specific plugin, based on its position in the list of total plugins associated with an account.
-- `Plugins`: Returns a list of all plugins associated with a particular account.
-- `addPlugin`: Connects an account with a specific plugin.
-- `removePlugin`: Disables a specific plugin associated with an account.
-- `removeAllPlugins`: Disables all plugins associated with an account.
-- `Update`: Overrides the classic ERC20 balance update, and is expanded to include plugin mechanics (`updateBalances`). Only called on mint, burn, or transfer events.
-
-## Plugin.sol (Plugin Contract)
-
-- A basic template for plugin creation.
-- Tracks an account’s balances through `_updateBalances`.
-- Provides advanced functionalities, such as farming, delegation, etc., without moving the plugged in tokens.
-
-### Includes
-
-#### Interfaces
-
-- `IPlugin`: Interface for plugin functionalities.
-- `IERC20Plugins`: Interface linking the plugin with a plugin-enabled ERC20 token.
-  
-#### State Variable
-
-- `TOKEN`: Stores a reference to the plugin-enabled ERC20 token contract.
-
-#### Modifiers
-
-- `onlyToken`: Ensures that certain functions can be called only by the associated plugin-enabled token contract.
-  
-#### Functions
-
-- `updateBalances`: An external function that updates account balances within the plugin. It can only be called by the token contract itself. (see `onlyToken` modifier)
-- `_updateBalances`: An abstract internal function, to be implemented in derived contracts. Responsible for the actual logic of updating balances within the plugin itself. 
-  - Note: Within `_updateBalances`, 'from' and 'to' amounts can be 0 for non-participants.
 
 ## Examples:
 **Simple plugin-enabled token contract**
@@ -173,7 +121,7 @@ contract MyPlugin is ERC20, Plugin {
 - [1inch Fusion (Delegated Staked 1INCH) Plugin Contract](https://etherscan.io/address/0x806d9073136c8A4A3fD21E0e708a9e17C87129e8#code)
 - [1inch Fusion Staking Farm](https://etherscan.io/address/0x1A87c0F9CCA2f0926A155640e8958a8A6B0260bE#code)
 
-## Other Helpful Links
+## Helpful Links
 - [Plugin-enabled ERC20 Token contract (abstract)](https://github.com/1inch/token-plugins/blob/master/contracts/ERC20Plugins.sol)
 - [Plugin contract (abstract)](https://github.com/1inch/token-plugins/blob/master/contracts/Plugin.sol)
 - [Anton Bukov speech at ETHCC](https://youtu.be/Is-T5Q2E0A8?feature=shared)
