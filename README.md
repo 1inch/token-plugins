@@ -42,13 +42,13 @@ The token plugins standard is designed to be secure and to prevent asset loss, g
 Here are some examples of how Token Plugins is currently being (or could be used) today:
 
 - **st1INCH resolver delegation**
-  Through staking 1INCH, token holders receive Unicorn Power (UP), and can earn rewards from Resolvers in the Intent Swap system. In order to earn these rewards, the UP received from staking must be delegated (see contract) to a specific Resolver. The resolver is incentivized to have UP delegated to them, so they will reward delegators with some amount of funds. The delegation of st1INCH is done with a token plugin, so there is no need to transfer the tokens to another contract.
+  Through staking 1INCH, token holders receive Unicorn Power (UP), and can earn rewards from Resolvers in the Intent Swap system. In order to earn these rewards, the UP received from staking must be delegated (see contract) to a specific Resolver. The resolver is incentivized to have UP delegated to them, so they will reward delegators with some amount of funds. The delegation of st1INCH is done with a token plugin, so there is no need to transfer the tokens to another contract. ([see dst1inch contract](https://etherscan.io/token/0xAccfAc2339e16DC80c50d2fa81b5c2B049B4f947#code))
 
 - **Weighted voting power**
   VE governance models like veCRV require the user to lock tokens for a certain amount of time to earn voting rights. This signals to the protocol a long-term vested interest and greatly reduces the surface area for governance attacks. With Token Plugins, the VE token model can be replaced with logic that gives the wallet ramping voting power by simply holding the base governance token for long periods of time. When a wallet first holds the governance token, its voting power will be nearly zero, but over time (e.g. 2 years), it will increase until it reaches a set maximum. 
 
 - **LP-Token farming**
-  Some protocols incentivize LP token holders with additional rewards beyond swap fees through an additional yield contract that holds the LP tokens and distributes the rewards proportionally to the participating LPs. With token plugins, these extra rewards for LP holders can continue to be opt-in without the need to deposit those LP tokens into a secondary contract. (See 1inch Fusion pods)
+  Some protocols incentivize LP token holders with additional rewards beyond swap fees through an additional yield contract that holds the LP tokens and distributes the rewards proportionally to the participating LPs. With token plugins, these extra rewards for LP holders can continue to be opt-in without the need to deposit those LP tokens into a secondary contract. ([See 1inch Fusion pods](https://etherscan.io/address/0x1A87c0F9CCA2f0926A155640e8958a8A6B0260bE#code))
 
 - **Shadow staking**
   If a protocol wanted to simply reward holders of their token, they could reward them similarly to the weighted voting power method, but instead of increasing voting power over time, the APR of holding the token can increase. Long-term holders will receive rewards and short-term holders/traders would not receive the same benefit.
