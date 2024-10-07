@@ -34,7 +34,7 @@ The token plugins standard is designed to be secure and to prevent asset loss, g
 - **Risk-free participation**: Token plugins do not require any approval, deposit, or transfer of funds into an external contract for participation.
 - **Multiple plugin connections**: Users can connect with multiple plugins, allowing for simultaneous involvement in multiple incentive programs or governance systems, etc. (subject to a predefined limit, set at deployment).
 - **Simple to adopt**: Implementation is only 150 lines of code.
-- **High security**: 1inch Token Plugins have gone through extensive audits by multiple top-tier companies.
+- **High security**: 1inch Token Plugins have gone through extensive [audits](https://github.com/1inch/1inch-audits/tree/master/Fusion%20mode%20and%20Token-plugins) by multiple top-tier companies.
 - **Built-in reentrancy protection**: This feature ensures that the balances cannot be tampered with by manipulating plugin accounting. 
 - **Custom ERC20 representation**: A plugin can be represented by its own associated ERC20 (custom inheritance), enabling building complex and multi-layered accounting systems like 1inch Fusion.
 
