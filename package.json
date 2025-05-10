@@ -1,15 +1,15 @@
 {
-  "name": "@1inch/token-plugins",
+  "name": "@1inch/token-hooks",
   "version": "1.3.0",
-  "description": "ERC20 extension enabling external smart contract based plugins to track balances of those users who opted-in to those plugins",
+  "description": "ERC20 extension enabling external smart contract based hooks to track balances of those users who opted-in to those hooks",
   "repository": {
     "type": "git",
-    "url": "git@github.com:1inch/token-plugins.git"
+    "url": "git@github.com:1inch/token-hooks.git"
   },
   "bugs": {
-    "url": "https://github.com/1inch/token-plugins/issues"
+    "url": "https://github.com/1inch/token-hooks/issues"
   },
-  "homepage": "https://github.com/1inch/token-plugins#readme",
+  "homepage": "https://github.com/1inch/token-hooks#readme",
   "author": "1inch",
   "license": "MIT",
   "dependencies": {
