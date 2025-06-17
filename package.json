@@ -13,15 +13,15 @@
   "author": "1inch",
   "license": "MIT",
   "dependencies": {
-    "@1inch/solidity-utils": "3.5.5",
+    "@1inch/solidity-utils": "6.6.0",
     "@openzeppelin/contracts": "5.0.1"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-chai-matchers": "2.0.2",
+    "@nomicfoundation/hardhat-chai-matchers": "2.0.8",
     "@nomicfoundation/hardhat-ethers": "3.0.5",
     "@nomicfoundation/hardhat-verify": "2.0.2",
     "@openzeppelin/test-helpers": "0.5.16",
-    "chai": "4.3.10",
+    "chai": "4.5.0",
     "dotenv": "16.3.1",
     "eslint": "8.56.0",
     "eslint-config-standard": "17.1.0",
