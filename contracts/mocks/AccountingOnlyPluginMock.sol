@@ -7,7 +7,7 @@ import { IERC20Plugins, Plugin } from "../Plugin.sol";
 
 contract AccountingOnlyPluginMock is ERC20, Plugin {
     uint256 public updateBalanceBurnCounter = 0;
-    uint256 public udateBalanceMintCounter = 0;
+    uint256 public updateBalanceMintCounter = 0;
 
     constructor(string memory name, string memory symbol, IERC20Plugins token_)
         ERC20(name, symbol)
@@ -16,12 +16,12 @@ contract AccountingOnlyPluginMock is ERC20, Plugin {
 
     function _updateBalances(address from, address to, uint256 /* amount */) internal override {
         if (from == address(0)) {
-            udateBalanceMintCounter++;
+            updateBalanceMintCounter++;
         } else if (to == address(0)) {
             updateBalanceBurnCounter++;
         } else {
             updateBalanceBurnCounter++;
-            udateBalanceMintCounter++;
+            updateBalanceMintCounter++;
         }
     }
 }
