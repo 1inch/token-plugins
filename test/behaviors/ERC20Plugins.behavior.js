@@ -23,6 +23,22 @@ function shouldBehaveLikeERC20Plugins (initContracts) {
             return { erc20Plugins, plugins, amount };
         }
 
+        async function initAndCreateReentrancyPlugins () {
+            const { erc20Plugins, amount } = await initContracts();
+
+            const PluginMock = await ethers.getContractFactory('AccountingOnlyPluginMock');
+            const plugin = await PluginMock.deploy('PLUGIN_TOKEN', 'PT', erc20Plugins);
+            await plugin.waitForDeployment();
+
+            const ReentrancyPluginMock = await ethers.getContractFactory('ReentrancyPluginMock');
+            const attackerPlugin = await ReentrancyPluginMock.deploy(erc20Plugins, plugin);
+            await attackerPlugin.waitForDeployment();
+
+            await erc20Plugins.mint(attackerPlugin, amount);
+
+            return { erc20Plugins, attackerPlugin, plugin, amount };
+        }
+
         async function initAndAddAllPlugins () {
             const { erc20Plugins, plugins, amount } = await initAndCreatePlugins();
             for (let i = 0; i < plugins.length; i++) {
@@ -72,17 +88,13 @@ function shouldBehaveLikeERC20Plugins (initContracts) {
                 for (let i = 0; i < plugins.length; i++) {
                     await erc20Plugins.addPlugin(plugins[i]);
                     expect(await erc20Plugins.pluginAt(wallet1, i)).to.be.equals(await plugins[i].getAddress());
-                    expect(await erc20Plugins.pluginAt(wallet1, i + 1)).to.be.equals(constants.ZERO_ADDRESS);
+                    expect((await erc20Plugins.plugins(wallet1)).length).to.be.equals(i + 1);
                 }
                 for (let i = plugins.length - 1; i >= 0; i--) {
                     await erc20Plugins.removePlugin(plugins[i]);
-                    for (let j = 0; j < plugins.length; j++) {
-                        expect(await erc20Plugins.pluginAt(wallet1, j))
-                            .to.be.equals(
-                                j >= i
-                                    ? constants.ZERO_ADDRESS
-                                    : await plugins[j].getAddress(),
-                            );
+                    expect((await erc20Plugins.plugins(wallet1)).length).to.be.equals(i);
+                    for (let j = 0; j < i; j++) {
+                        expect(await erc20Plugins.pluginAt(wallet1, j)).to.be.equals(await plugins[j].getAddress());
                     };
                 }
             });
@@ -208,6 +220,12 @@ function shouldBehaveLikeERC20Plugins (initContracts) {
                 expect(await erc20Plugins.pluginsCount(wallet1)).to.be.equals(plugins.length);
                 await erc20Plugins.removeAllPlugins();
                 expect(await erc20Plugins.pluginsCount(wallet1)).to.be.equals(0);
+            });
+
+            it('reentrancy should not work via removePlugin', async function () {
+                const { attackerPlugin, plugin } = await loadFixture(initAndCreateReentrancyPlugins);
+                await attackerPlugin.attack();
+                expect(await plugin.updateBalanceBurnCounter()).to.be.equals(1);
             });
         });
 

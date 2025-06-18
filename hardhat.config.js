@@ -3,6 +3,7 @@ require('@nomicfoundation/hardhat-verify');
 require('@nomicfoundation/hardhat-chai-matchers');
 require('solidity-coverage');
 require('hardhat-deploy');
+require('hardhat-tracer');
 require('hardhat-gas-reporter');
 require('dotenv').config();
 const { Networks, getNetwork } = require('@1inch/solidity-utils/hardhat-setup');
@@ -31,5 +32,8 @@ module.exports = {
     gasReporter: {
         enable: true,
         currency: 'USD',
+    },
+    tracer: {
+        enableAllOpcodes: true,
     },
 };

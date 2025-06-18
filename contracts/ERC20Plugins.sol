@@ -131,12 +131,11 @@ abstract contract ERC20Plugins is ERC20, IERC20Plugins, ReentrancyGuardExt {
     }
 
     function _removeAllPlugins(address account) internal virtual {
-        address[] memory pluginItems = _plugins[account].items.get();
+        address[] memory pluginItems = _plugins[account].erase();
         uint256 balance = balanceOf(account);
         unchecked {
-            for (uint256 i = pluginItems.length; i > 0; i--) {
-                address item = pluginItems[i-1];
-                _plugins[account].remove(item);
+            for (uint256 i = 0; i < pluginItems.length; i++) {
+                address item = pluginItems[i];
                 emit PluginRemoved(account, item);
                 if (balance > 0) {
                     _updateBalances(item, account, address(0), balance);
