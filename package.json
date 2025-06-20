@@ -50,6 +50,9 @@
     "test": "hardhat test --parallel",
     "test:ci": "hardhat test"
   },
+  "resolutions": {
+    "elliptic": "6.5.7"
+  },
   "files": [
     "contracts",
     "test/behaviors/*.js"
