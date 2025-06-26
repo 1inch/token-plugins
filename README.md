@@ -17,7 +17,7 @@
 [Helpful Links](#other-helpful-links)
 
 ## Overview
-> **Note:** Token Hooks were previously known as Token Plugins. The name was changed to better reflect the nature of the functionality.
+> **Note:** Token Hooks were previously known as Token Plugins. The name was changed to better reflect their role as token balance hooks that respond to balance changes in ERC20 tokens.
 
 Token hooks are smart contracts that extend the capabilities of ERC20 tokens and wrappers by adding custom accounting features to the original token. Inspired by the hook concept widely used in the web 2.0 world, these hooks enable users to **dynamically increase the functionality of their tokens on-demand** without the need to transfer tokens to a special smart contract.
 
@@ -31,6 +31,13 @@ The token hooks standard is designed to be secure and to prevent asset loss, gas
 
 ***Note: ERC721 (NFT) and ERC1155 (Multi-token) support is coming soon!***
 
+## Hook Flexibility
+
+Token Hooks offer an elegant solution for extending token functionality **selectively for holders who need it**. This opt-in approach means:
+- Individual holders can customize their token experience based on their unique needs
+- DAOs can govern which hooks are recommended or incentivized without forcing changes on all token holders
+- Different user segments can have different token capabilities within the same token ecosystem
+
 ## Primary Benefits
 - **100% permissionless from the token contract owner**: Open to all participants.
 - **Risk-free participation**: Token hooks do not require any approval, deposit, or transfer of funds into an external contract for participation.
@@ -40,6 +47,13 @@ The token hooks standard is designed to be secure and to prevent asset loss, gas
 - **High security**: 1inch Token Hooks have gone through extensive [audits](https://github.com/1inch/1inch-audits/tree/master/Fusion%20mode%20and%20Token-hooks) by multiple top-tier companies.
 - **Built-in reentrancy protection**: This feature ensures that the balances cannot be tampered with by manipulating hook accounting. 
 - **Custom ERC20 representation**: A hook can be represented by its own associated ERC20 (custom inheritance), enabling building complex and multi-layered accounting systems like 1inch Fusion.
+
+## Security Model
+
+Token Hooks implement a clean security model that provides maximum flexibility without compromising token integrity:
+- Hooks operate as **passive observers** that react to balance changes but cannot block transfers
+- The underlying token remains fully functional and secure, regardless of hook behavior
+- Gas limits and failure isolation prevent malicious hooks from disrupting token operations
 
 ## Use-Cases
 Here are some examples of how Token Hooks is currently being (or could be used) today, showcasing its ability to power automated governance systems and on-demand token functionality:
