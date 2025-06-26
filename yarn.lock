@@ -5016,7 +5016,7 @@ hardhat-gas-reporter@1.0.9:
     eth-gas-reporter "^0.2.25"
     sha1 "^1.1.1"
 
-hardhat-tracer@3.2.1:
+hardhat-tracer@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/hardhat-tracer/-/hardhat-tracer-3.2.1.tgz#1d8172dd41229fb09d66a8dcadc73bbb19c928da"
   integrity sha512-nCRCi8zQYDkNw9xDngokbmBmBDNuX9BadgvoRNVgpVpFkriRirdBVinYfBc7P+vufZhNNOjxyIDOPQs+ViRN9Q==
