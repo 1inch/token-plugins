@@ -1,6 +1,11 @@
 artifacts
 cache
 node_modules
+
+# Foundry
+cache/foundry/
+artifacts/foundry/
+lib/
 hardhat-dependency-compiler
 coverage
 coverage.json

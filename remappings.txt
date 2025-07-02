@@ -1,0 +1,4 @@
+@openzeppelin/=node_modules/@openzeppelin/
+@1inch/=node_modules/@1inch/
+ds-test/=lib/forge-std/lib/ds-test/src/
+forge-std/=lib/forge-std/src/
