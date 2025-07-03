@@ -39,6 +39,8 @@
   },
   "scripts": {
     "clean": "rimraf artifacts cache coverage coverage.json contracts/hardhat-dependency-compiler",
+    "clean:foundry": "forge clean",
+    "clean:all": "yarn clean && yarn clean:foundry",
     "coverage": "hardhat coverage",
     "deploy": "hardhat deploy --network",
     "lint": "yarn run lint:js && yarn run lint:sol",
@@ -48,6 +50,8 @@
     "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
     "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
     "test": "hardhat test --parallel",
+    "test:foundry": "forge test -vvv",
+    "test:all": "yarn test && yarn test:foundry",
     "test:ci": "hardhat test"
   },
   "resolutions": {
